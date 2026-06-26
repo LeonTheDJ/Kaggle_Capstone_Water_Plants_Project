@@ -5,7 +5,7 @@ const DEFAULT_PLANTS = [
   {
     id: "default-1",
     name: "Großes Basilikum",
-    species: "Ocimum basilicum",
+    species: "Kräuter (Wasserliebend)",
     lastWatered: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
     sunHours: 6.0,
     imageUrl: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&auto=format&fit=crop&q=80",
@@ -18,7 +18,7 @@ const DEFAULT_PLANTS = [
   {
     id: "default-2",
     name: "Hängende Erdbeere",
-    species: "Fragaria",
+    species: "Obst & Beeren",
     lastWatered: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), // 4 days ago
     sunHours: 5.0,
     imageUrl: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=300&auto=format&fit=crop&q=80",
@@ -31,7 +31,7 @@ const DEFAULT_PLANTS = [
   {
     id: "default-3",
     name: "Kleine Aloe Vera",
-    species: "Aloe vera",
+    species: "Sukkulenten & Kakteen",
     lastWatered: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
     sunHours: 3.0,
     imageUrl: "https://images.unsplash.com/photo-1509423306649-46dc9734f49b?w=300&auto=format&fit=crop&q=80",

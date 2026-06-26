@@ -11,9 +11,9 @@ This skill defines the botanical reasoning framework and calculations used by th
 
 ## 1. Reference Plant Database
 
-The agent utilizes the plant lookup database located in the skill resources folder at `resources/plant_database.json`. This database defines the standard baseline metrics for the 50 most common balcony plants:
+The agent utilizes the plant category database located in the skill resources folder at `resources/plant_database.json`. This database defines the standard baseline metrics for the primary plant categories:
 - `base_depletion_pct`: The average percentage of soil moisture lost daily under baseline conditions (20°C, average humidity, and optimal sun exposure).
-- `optimal_sun_hours`: The standard daily sun exposure expected for this species.
+- `optimal_sun_hours`: The standard daily sun exposure expected for this category.
 
 ---
 
@@ -30,8 +30,8 @@ Where the daily moisture depletion rate ($\text{DailyDepletion}_{d}$) is calcula
 $$\text{DailyDepletion}_{d} = B \times F_{\text{temp}} \times F_{\text{sun}} \times F_{\text{humidity}} - \text{RainBonus}_{d}$$
 
 ### Parameters & Factors:
-1.  **Base Depletion ($B$):** Loaded from `resources/plant_database.json` matching the plant species.
-    *   *If the plant species is not in the database:* Match it to the closest family or category (e.g., Herb, Succulent, Vegetable, Flower) and estimate a comparable $B$ (Low = 5%, Medium = 10%, High = 16%, Very High = 22%).
+1.  **Base Depletion ($B$):** Loaded from `resources/plant_database.json` matching the plant's `species` parameter (which represents the category name, e.g., "Kräuter (Wasserliebend)" or "Sukkulenten & Kakteen").
+    *   *If the category is not directly found in the database:* Match it to the closest category available and extract its parameters.
 2.  **Temperature Factor ($F_{\text{temp}}$):** Calculated from the day's mean temperature ($T_{\text{mean}}$):
     *   $F_{\text{temp}} = T_{\text{mean}} / 20.0$ (restricted to a minimum of 0.2 in freezing weather).
 3.  **Sun Exposure Factor ($F_{\text{sun}}$):** Combines the plant's configured sun hours ($S_{\text{plant}}$) and the species optimal sun hours ($S_{\text{optimal}}$):

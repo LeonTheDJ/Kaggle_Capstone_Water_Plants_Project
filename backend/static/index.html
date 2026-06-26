@@ -13,7 +13,7 @@
     
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script type="module" crossorigin src="/assets/index-Bclw2MWU.js"></script>
+    <script type="module" crossorigin src="/assets/index-BHU9u2NU.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-Cede0AS_.css">
   </head>
   <body>
@@ -92,8 +92,21 @@
               <input type="text" id="field-plant-name" required placeholder="z.B. Süßes Basilikum" />
             </div>
             <div class="form-group">
-              <label for="field-plant-species">Art/Spezies</label>
-              <input type="text" id="field-plant-species" placeholder="z.B. Basilikum (Ocimum basilicum)" />
+              <label for="field-plant-species">Pflanzenkategorie*</label>
+              <select id="field-plant-species" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.65rem 0.8rem; color: var(--text-primary); font-family: var(--font-main); font-size: 0.95rem; transition: var(--transition-smooth); cursor: pointer; width: 100%;">
+                <option value="" disabled selected>Kategorie auswählen...</option>
+                <option value="Kräuter (Wasserliebend)">Kräuter - Wasserliebend (z.B. Basilikum, Minze, Petersilie)</option>
+                <option value="Kräuter (Mediterran)">Kräuter - Mediterran/Robust (z.B. Rosmarin, Thymian, Lavendel)</option>
+                <option value="Sukkulenten & Kakteen">Sukkulenten & Kakteen (z.B. Aloe Vera, Hauswurz)</option>
+                <option value="Blühpflanzen (Durstig)">Blühpflanzen - Wasserliebend (z.B. Hortensie, Petunie, Fuchsie)</option>
+                <option value="Blühpflanzen (Normal)">Blühpflanzen - Normal (z.B. Geranie, Margerite, Begonie)</option>
+                <option value="Gemüse (Durstig)">Gemüse - Wasserliebend (z.B. Tomate, Gurke, Zucchini)</option>
+                <option value="Gemüse (Normal)">Gemüse - Normal (z.B. Chili, Paprika)</option>
+                <option value="Obst & Beeren">Obst & Beeren (z.B. Erdbeere, Himbeere)</option>
+                <option value="Kübelpflanzen (Mediterran)">Kübelpflanzen - Mediterran (z.B. Olivenbaum, Zitronenbaum, Oleander)</option>
+                <option value="Kletterpflanzen & Efeu">Kletterpflanzen & Efeu (z.B. Efeu, Wilder Wein)</option>
+                <option value="Grünpflanzen (Schattig)">Grünpflanzen & Farne - Schattenliebend (z.B. Farne, Hosta)</option>
+              </select>
             </div>
             <div class="form-group-row">
               <div class="form-group">
