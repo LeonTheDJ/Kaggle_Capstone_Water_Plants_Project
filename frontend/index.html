@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="FloraCast - Dein intelligenter Balkonpflanzen-Bewässerungsberater mit KI-Unterstützung." />
+    <title>FloraCast // Dein KI-Balkonpflanzen-Assistent</title>
+    
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <div id="app">
+      <!-- Background Decorative Blobs -->
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      
+      <header class="app-header">
+        <div class="logo">
+          <i class="fa-solid fa-leaf-heart header-leaf"></i>
+          <h1>Flora<span>Cast</span></h1>
+        </div>
+        <p class="subtitle">Dein intelligenter Balkonpflanzen-Bewässerungsberater</p>
+      </header>
+
+      <main class="container">
+        <!-- Balcony Settings & Actions Panel -->
+        <section class="control-panel glass">
+          <div class="panel-section balcony-summary">
+            <h3><i class="fa-solid fa-cloud-sun"></i> Mein Balkon-Profil</h3>
+            <div class="balcony-info-grid">
+              <div>
+                <span class="label">Standort:</span>
+                <span id="display-location" class="val">-</span>
+              </div>
+              <div>
+                <span class="label">Sonne/Tag:</span>
+                <span id="display-sun" class="val">-</span>
+              </div>
+              <div>
+                <span class="label">Überdacht:</span>
+                <span id="display-covered" class="val">-</span>
+              </div>
+            </div>
+            <button id="btn-edit-balcony" class="btn btn-secondary btn-sm"><i class="fa-solid fa-gear"></i> Balkon ändern</button>
+          </div>
+
+          <div class="panel-section action-buttons">
+            <button id="btn-add-plant" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Pflanze hinzufügen</button>
+            <button id="btn-analyze" class="btn btn-accent"><i class="fa-solid fa-wand-magic-sparkles"></i> KI-Analyse starten</button>
+          </div>
+        </section>
+
+        <!-- Plant Cards Grid -->
+        <section class="plants-section">
+          <div class="section-header">
+            <h2>Meine Pflanzen (<span id="plant-count">0</span>)</h2>
+            <div class="export-import-actions">
+              <button id="btn-backup-export" class="btn btn-link btn-xs" title="Daten exportieren"><i class="fa-solid fa-download"></i> Backup exportieren</button>
+              <button id="btn-backup-import" class="btn btn-link btn-xs" title="Daten importieren"><i class="fa-solid fa-upload"></i> Backup laden</button>
+              <input type="file" id="backup-file-input" style="display: none;" accept=".json" />
+            </div>
+          </div>
+          <div id="plants-grid" class="plants-grid scrollable-y">
+            <!-- Dynamic Plant Cards injected here -->
+            <div class="no-plants-placeholder">
+              <i class="fa-solid fa-seedling"></i>
+              <p>Noch keine Pflanzen erfasst. Füge deine erste Pflanze hinzu!</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Modal: Add / Edit Plant -->
+      <div id="modal-plant" class="modal">
+        <div class="modal-content glass">
+          <div class="modal-header">
+            <h3 id="modal-plant-title">Neue Pflanze hinzufügen</h3>
+            <span class="close-btn" id="close-modal-plant">&times;</span>
+          </div>
+          <form id="form-plant" class="modal-form">
+            <input type="hidden" id="field-plant-id" />
+            <div class="form-group">
+              <label for="field-plant-name">Name der Pflanze*</label>
+              <input type="text" id="field-plant-name" required placeholder="z.B. Süßes Basilikum" />
+            </div>
+            <div class="form-group">
+              <label for="field-plant-species">Art/Spezies</label>
+              <input type="text" id="field-plant-species" placeholder="z.B. Basilikum (Ocimum basilicum)" />
+            </div>
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="field-plant-sun">Sonnenstunden/Tag*</label>
+                <input type="number" id="field-plant-sun" required min="0" max="24" step="0.5" />
+                <span class="field-tip">Standardwert des Balkons vorgeschlagen</span>
+              </div>
+              <div class="form-group">
+                <label for="field-plant-last-watered">Zuletzt gegossen*</label>
+                <input type="datetime-local" id="field-plant-last-watered" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="field-plant-image">Bild-URL</label>
+              <input type="url" id="field-plant-image" placeholder="https://images.unsplash.com/... (optional)" />
+            </div>
+            <div class="form-group">
+              <label for="field-plant-desc">Beschreibung / Standort</label>
+              <textarea id="field-plant-desc" rows="2" placeholder="z.B. Steht im schattigen Eck links... (optional)"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" id="btn-cancel-plant">Abbrechen</button>
+              <button type="submit" class="btn btn-primary">Speichern</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal: Edit Balcony Settings -->
+      <div id="modal-balcony" class="modal">
+        <div class="modal-content glass">
+          <div class="modal-header">
+            <h3>Balkon-Profil bearbeiten</h3>
+            <span class="close-btn" id="close-modal-balcony">&times;</span>
+          </div>
+          <form id="form-balcony" class="modal-form">
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="field-balcony-city">Stadt*</label>
+                <input type="text" id="field-balcony-city" required placeholder="z.B. Berlin" />
+              </div>
+              <div class="form-group">
+                <label for="field-balcony-zip">Postleitzahl*</label>
+                <input type="text" id="field-balcony-zip" required placeholder="z.B. 10117" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="field-balcony-sun">Durchschnittliche Sonnenstunden/Tag auf dem Balkon*</label>
+              <input type="number" id="field-balcony-sun" required min="0" max="24" step="0.5" placeholder="z.B. 6" />
+            </div>
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="field-balcony-covered" />
+              <label for="field-balcony-covered">Der Balkon ist überdacht (Regen kommt nicht an die Pflanzen)</label>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" id="btn-cancel-balcony">Abbrechen</button>
+              <button type="submit" class="btn btn-primary">Speichern</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Loading / Progress Overlay -->
+      <div id="loading-overlay" class="overlay">
+        <div class="spinner-container glass">
+          <div class="spinner"></div>
+          <p id="loading-text">Analysiere Wetter- & Pflanzendaten...</p>
+        </div>
+      </div>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
