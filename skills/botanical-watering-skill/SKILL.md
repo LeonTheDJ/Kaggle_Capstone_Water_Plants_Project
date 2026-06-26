@@ -34,8 +34,9 @@ $$\text{DailyDepletion}_{d} = B \times F_{\text{temp}} \times F_{\text{sun}} \ti
     *   *If the category is not directly found in the database:* Match it to the closest category available and extract its parameters.
 2.  **Temperature Factor ($F_{\text{temp}}$):** Calculated from the day's mean temperature ($T_{\text{mean}}$):
     *   $F_{\text{temp}} = T_{\text{mean}} / 20.0$ (restricted to a minimum of 0.2 in freezing weather).
-3.  **Sun Exposure Factor ($F_{\text{sun}}$):** Combines the plant's configured sun hours ($S_{\text{plant}}$) and the species optimal sun hours ($S_{\text{optimal}}$):
-    *   $F_{\text{sun}} = 1.0 + 0.1 \times (S_{\text{plant}} - S_{\text{optimal}})$
+3.  **Sun Exposure Factor ($F_{\text{sun}}$):** Combines the plant's configured sun hours ($S_{\text{plant}}$) and the category's optimal sun hours ($S_{\text{optimal}}$):
+    *   $F_{\text{sun}} = 1.0 + 0.15 \times (S_{\text{plant}} - S_{\text{optimal}})$ (restricted to a minimum of 0.2 in heavy shade).
+    *   *Interpretation:* Each hour of sun above the optimal requirement increases water consumption by 15%. Each hour of deficit decreases consumption by 15%.
 4.  **Humidity Factor ($F_{\text{humidity}}$):** Calculated from the day's mean relative humidity ($H_{\text{mean}}$):
     *   $F_{\text{humidity}} = 1.5 - (H_{\text{mean}} / 100.0)$
 5.  **Rain Bonus ($\text{RainBonus}_{d}$):**
@@ -59,4 +60,5 @@ $$\text{DailyDepletion}_{d} = B \times F_{\text{temp}} \times F_{\text{sun}} \ti
 The agent must output a concise 1-2 sentence German explanation summarizing the reasoning:
 - Cite the estimated moisture level.
 - Mention recent weather parameters (e.g., high temperatures, low humidity, or rain).
-- Mention if the plant's sun exposure settings or balcony coverage impacted the outcome.
+- **Sun Exposure Impact:** Explicitly mention if the plant's actual sun hours deviate from the optimal sun hours for its category (e.g., "Da die Pflanze mit 8 Std. Sonne mehr Licht bekommt als die optimalen 5 Std., verdunstet sie Wasser schneller." or "Der halbschattige Standort (2 Std. statt 5 Std. Sonne) reduziert den Wasserbedarf.").
+- Mention if the balcony coverage (covered vs. open) and recent rain impacted the soil moisture.
