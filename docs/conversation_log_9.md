@@ -97,6 +97,9 @@ We added and committed all changes using the Git Commit Version skill helper scr
 8. **Commit 8 (README Clarification):**
    - Clarified the distinction between local `.env` configuration (Gemini API key) and Google Cloud environment configurations in the README.
    - Message: `docs: clarify local env and GCP configuration in README.md`
+9. **Commit 9 (README Security Warning):**
+   - Added a prominent warning in the README emphasizing the absolute necessity of adding the `.env` file to `.gitignore` to prevent secret leaks.
+   - Message: `docs: add .gitignore warning for .env in README.md`
 
 ---
 
@@ -104,6 +107,7 @@ We added and committed all changes using the Git Commit Version skill helper scr
 
 | Hash | Message |
 |------|---------|
+| `2c8466d` | `docs: add .gitignore warning for .env in README.md` |
 | `1cd4451` | `docs: clarify local env and GCP configuration in README.md` |
 | `de666eb` | `docs: add Google Cloud coupling section to README.md` |
 | `d4d49e9` | `docs: document GCP credentials and template checks in safety skills` |
@@ -127,3 +131,4 @@ We added and committed all changes using the Git Commit Version skill helper scr
 | 2026-06-27 | Antigravity | Documented GCP credentials and templates checks in skills. |
 | 2026-06-27 | Antigravity | Documented Google Cloud coupling steps in README.md. |
 | 2026-06-27 | Antigravity | Clarified local env setup vs GCP coupling in README.md. |
+| 2026-06-27 | Antigravity | Added .gitignore warning for .env in README.md. |
