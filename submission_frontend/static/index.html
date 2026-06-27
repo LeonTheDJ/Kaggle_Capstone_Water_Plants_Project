@@ -211,7 +211,7 @@
           species: "Water-loving Herbs",
           lastWatered: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
           sunHours: 6.0,
-          imageUrl: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&auto=format&fit=crop&q=80",
+          imageUrl: "/img/App_Logo.svg",
           description: "Main balcony, middle.",
           moisture_level: 65,
           status: "Healthy",
@@ -224,7 +224,7 @@
           species: "Fruits & Berries",
           lastWatered: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
           sunHours: 5.0,
-          imageUrl: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=300&auto=format&fit=crop&q=80",
+          imageUrl: "/img/App_Logo.svg",
           description: "On the left railing.",
           moisture_level: 22,
           status: "Water Now",
@@ -237,7 +237,7 @@
           species: "Succulents & Cacti",
           lastWatered: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
           sunHours: 3.0,
-          imageUrl: "https://images.unsplash.com/photo-1509423306649-46dc9734f49b?w=300&auto=format&fit=crop&q=80",
+          imageUrl: "/img/App_Logo.svg",
           description: "Top shadow shelf.",
           moisture_level: 80,
           status: "Healthy",
@@ -304,8 +304,10 @@
         }
 
         plantsGrid.innerHTML = state.plants.map(plant => {
-          const defaultImg = "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300&auto=format&fit=crop&q=80";
+          const defaultImg = "/img/App_Logo.svg";
           const imgUrl = plant.imageUrl || defaultImg;
+          const isLogo = imgUrl === defaultImg || imgUrl.includes("App_Logo.svg");
+          const logoClass = isLogo ? "logo-img" : "";
           
           // Try to safely format date
           let lastWateredDate = "Unknown";
@@ -321,7 +323,7 @@
           
           return `
             <div class="plant-card glass fade-in">
-              <div class="plant-card-img" style="background-image: url('${imgUrl}')"></div>
+              <div class="plant-card-img ${logoClass}" style="background-image: url('${imgUrl}')"></div>
               <div class="plant-card-content">
                 <div class="plant-header">
                   <h4>${plant.name}</h4>

@@ -214,6 +214,11 @@ async def get_sessions():
     """List recent agent sessions and summaries."""
     return SESSIONS_DB
 
+# Mount img files
+img_dir = os.path.join(os.path.dirname(__file__), "img")
+if os.path.exists(img_dir):
+    app.mount("/img", StaticFiles(directory=img_dir), name="img")
+
 # Mount static files
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
