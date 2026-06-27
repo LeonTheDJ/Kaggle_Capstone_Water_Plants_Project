@@ -164,13 +164,19 @@
                 <input type="text" id="field-balcony-city" required placeholder="e.g. Munich" />
               </div>
               <div class="form-group">
+                <label for="field-balcony-country">Country*</label>
+                <input type="text" id="field-balcony-country" required placeholder="e.g. Germany" />
+              </div>
+            </div>
+            <div class="form-group-row">
+              <div class="form-group">
                 <label for="field-balcony-zip">Zip Code*</label>
                 <input type="text" id="field-balcony-zip" required placeholder="e.g. 80331" />
               </div>
-            </div>
-            <div class="form-group">
-              <label for="field-balcony-sun">Default Daily Sun Exposure (Hours)*</label>
-              <input type="number" id="field-balcony-sun" required min="0" max="24" step="0.5" />
+              <div class="form-group">
+                <label for="field-balcony-sun">Default Daily Sun Exposure (Hours)*</label>
+                <input type="number" id="field-balcony-sun" required min="0" max="24" step="0.5" />
+              </div>
             </div>
             <div class="form-group checkbox-group">
               <input type="checkbox" id="field-balcony-covered" />
@@ -242,6 +248,7 @@
 
       const DEFAULT_BALCONY = {
         city: "Munich",
+        country: "Germany",
         zipCode: "80331",
         defaultSunHours: 5.0,
         isCovered: false
@@ -277,7 +284,7 @@
 
       // Render Balcony Info
       function renderBalcony() {
-        displayLocation.textContent = `${state.balcony.city} (${state.balcony.zipCode})`;
+        displayLocation.textContent = `${state.balcony.city}, ${state.balcony.country || 'Germany'} (${state.balcony.zipCode})`;
         displaySun.textContent = `${state.balcony.defaultSunHours} hrs/day`;
         displayCovered.textContent = state.balcony.isCovered ? "Covered" : "Open";
       }
@@ -414,7 +421,8 @@
       // Fetch Weather details
       async function updateWeather() {
         try {
-          const res = await fetch(`${API_BASE}/api/weather/${encodeURIComponent(state.balcony.city)}`);
+          const query = state.balcony.country ? `${state.balcony.city}, ${state.balcony.country}` : state.balcony.city;
+          const res = await fetch(`${API_BASE}/api/weather/${encodeURIComponent(query)}`);
           if (!res.ok) throw new Error("Weather fetch failed");
           const data = await res.json();
           
@@ -478,6 +486,7 @@
         try {
           const url = new URL(`${API_BASE}/api/analyze`);
           url.searchParams.append("city", state.balcony.city);
+          url.searchParams.append("country", state.balcony.country || "Germany");
           url.searchParams.append("plant_name", plant.name);
           url.searchParams.append("species", plant.species);
           url.searchParams.append("last_watered", plant.lastWatered);
@@ -551,6 +560,7 @@
 
       btnEditBalcony.addEventListener("click", () => {
         document.getElementById("field-balcony-city").value = state.balcony.city;
+        document.getElementById("field-balcony-country").value = state.balcony.country || "Germany";
         document.getElementById("field-balcony-zip").value = state.balcony.zipCode;
         document.getElementById("field-balcony-sun").value = state.balcony.defaultSunHours;
         document.getElementById("field-balcony-covered").checked = state.balcony.isCovered;
@@ -625,6 +635,7 @@
         e.preventDefault();
         
         state.balcony.city = document.getElementById("field-balcony-city").value.trim();
+        state.balcony.country = document.getElementById("field-balcony-country").value.trim();
         state.balcony.zipCode = document.getElementById("field-balcony-zip").value.trim();
         state.balcony.defaultSunHours = parseFloat(document.getElementById("field-balcony-sun").value);
         state.balcony.isCovered = document.getElementById("field-balcony-covered").checked;

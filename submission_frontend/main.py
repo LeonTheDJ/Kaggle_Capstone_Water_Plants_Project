@@ -108,6 +108,7 @@ async def get_weather(city: str):
 @app.get("/api/analyze")
 async def analyze_plant(
     city: str,
+    country: str,
     plant_name: str,
     species: str,
     last_watered: str,
@@ -126,9 +127,9 @@ async def analyze_plant(
     - Last Watered: {last_watered}
     - Sun Hours/Day: {sun_hours}
     - Balcony Type: {"Covered" if is_covered else "Open"}
-    - Location: {city}
+    - Location: {city}, {country}
 
-    First, check the weather in {city} using your get_weather tool.
+    First, check the weather in {city}, {country} using your get_weather tool.
     Then, calculate the estimated moisture level (0-100%) and determine the watering status:
     - "Healthy": Moisture >= 50%
     - "Water Soon": Moisture 25-49%
