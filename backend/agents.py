@@ -20,8 +20,8 @@ class SinglePlantAnalysis(BaseModel):
     moisture_level: int = Field(..., description="Estimated soil moisture percentage from 0 (bone dry) to 100 (fully saturated)")
     status: str = Field(..., description="Must be one of: 'Water Now' (very dry), 'Water Soon' (moderately dry), or 'Healthy' (well watered)")
     next_watering_date: str = Field(..., description="Estimated ISO date string (YYYY-MM-DD) for when the plant will next require watering")
-    explanation: str = Field(..., description="A concise 1-2 sentence explanation in German of why this decision was made, citing weather and sun exposure.")
-    watering_tips: str = Field(..., description="Ein prägnanter, handlungsorientierter qualitativer Gieß- oder Pflegetipp auf Deutsch für diese Pflanze, passend zur aktuellen Feuchtigkeit und Pflanzenart.")
+    explanation: str = Field(..., description="A concise 1-2 sentence explanation in English of why this decision was made, citing weather and sun exposure.")
+    watering_tips: str = Field(..., description="A concise, actionable qualitative watering or care tip in English for this plant, matching the current moisture and plant species.")
 
 class BatchAnalysisResponse(BaseModel):
     analyses: List[SinglePlantAnalysis]
@@ -210,11 +210,11 @@ We have calculated the following deterministic moisture levels, statuses, and ne
 
 ### Instructions:
 For each plant in the list, you must preserve the pre-calculated 'moisture_level', 'status', and 'next_watering_date' values exactly as given above.
-Your task is to write a concise 1-2 sentence German explanation summarizing the reasoning for these numbers, citing:
+Your task is to write a concise 1-2 sentence English explanation summarizing the reasoning for these numbers, citing:
 1. The estimated moisture level.
 2. The weather parameters (recent temperatures, relative humidity, or rain if applicable).
 3. The impact of the plant's sun hours setting (especially if it deviates from the optimal sun hours for its category) and whether the balcony coverage protected it from rain.
-4. Ein handlungsorientierter qualitativer Gieß- oder Pflegetipp auf Deutsch (watering_tips) passend zur aktuellen Feuchtigkeit und Pflanzenart (z. B. 'Gieße am besten von unten...' oder 'Vermeide Wasser auf den Blättern...').
+4. A concise, actionable qualitative watering or care tip in English (watering_tips) matching the current moisture and plant species (e.g., 'Water from below as the soil is highly dried out...' or 'Avoid wetting the leaves during midday sun...').
 
 Return the final results matching the BatchAnalysisResponse schema.
 """
@@ -247,6 +247,7 @@ Return the final results matching the BatchAnalysisResponse schema.
                 "moisture_level": 50,
                 "status": "Healthy",
                 "next_watering_date": datetime.now().strftime("%Y-%m-%d"),
-                "explanation": "Analyse konnte nicht durchgeführt werden. (API-Fehler: " + str(e) + ")"
+                "explanation": "Analysis could not be performed. (API Error: " + str(e) + ")",
+                "watering_tips": "Unable to generate tips at this time."
             })
         return fallback_results

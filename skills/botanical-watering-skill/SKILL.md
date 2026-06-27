@@ -21,7 +21,7 @@ The agent utilizes the plant category database located in the skill resources fo
 
 The soil moisture level is calculated deterministically in Python (by simulating daily water loss starting from 100% after watering down to the current day). 
 
-To write accurate German explanations, you should understand the conceptual relationships behind the calculations:
+To write accurate English explanations, you should understand the conceptual relationships behind the calculations:
 1.  **Baseline Consumption:** Each plant category has a baseline daily water depletion rate (e.g., water-loving herbs dry out quickly, while succulents lose very little moisture).
 2.  **Temperature Impact:** Higher temperatures accelerate drying (proportional to deviation from 20°C), while cooler weather slows it down.
 3.  **Sun Exposure Impact:** For every hour that the plant's configured sun exposure exceeds the category's optimal sun hours, evaporation increases by 15%. Conversely, shade decreases water needs by 15% per hour of deficit.
@@ -38,12 +38,12 @@ To write accurate German explanations, you should understand the conceptual rela
 
 ---
 
-## 4. Explanation Writing Style (German)
+## 4. Explanation Writing Style (English)
 
-The agent must output a concise 1-2 sentence German explanation summarizing the reasoning:
+The agent must output a concise 1-2 sentence English explanation summarizing the reasoning:
 - Cite the estimated moisture level.
 - Mention recent weather parameters (e.g., high temperatures, low humidity, or rain).
-- **Sun Exposure Impact:** Explicitly mention if the plant's actual sun hours deviate from the optimal sun hours for its category (e.g., "Da die Pflanze mit 8 Std. Sonne mehr Licht bekommt als die optimalen 5 Std., verdunstet sie Wasser schneller." or "Der halbschattige Standort (2 Std. statt 5 Std. Sonne) reduziert den Wasserbedarf.").
+- **Sun Exposure Impact:** Explicitly mention if the plant's actual sun hours deviate from the optimal sun hours for its category (e.g., "Since the plant receives 8 hrs of sun, which is more than the optimal 5 hrs, it evaporates water faster." or "The partial shade location (2 hrs instead of 5 hrs of sun) reduces its water requirements.").
 - Mention if the balcony coverage (covered vs. open) and recent rain impacted the soil moisture.
 
 ---

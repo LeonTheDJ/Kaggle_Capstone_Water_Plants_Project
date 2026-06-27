@@ -5,7 +5,7 @@ const DEFAULT_PLANTS = [
   {
     id: "default-1",
     name: "Example Plant",
-    species: "Kräuter (Wasserliebend)",
+    species: "Water-loving Herbs",
     lastWatered: new Date().toISOString(),
     sunHours: 0.0,
     imageUrl: "/img/App_Logo.svg",
@@ -107,10 +107,10 @@ function saveState() {
 // UI Update: Render Balcony Summary
 function updateBalconyUI() {
   elDisplayLocation.textContent = `${state.balcony.city} (${state.balcony.zipCode})`;
-  elDisplaySun.textContent = `${state.balcony.defaultSunHours} Std.`;
+  elDisplaySun.textContent = `${state.balcony.defaultSunHours} hrs/day`;
   elDisplayCovered.innerHTML = state.balcony.isCovered
-    ? '<span class="status-yes"><i class="fa-solid fa-circle-check"></i> Ja</span>'
-    : '<span class="status-no"><i class="fa-solid fa-circle-xmark"></i> Nein</span>';
+    ? '<span class="status-yes"><i class="fa-solid fa-circle-check"></i> Yes</span>'
+    : '<span class="status-no"><i class="fa-solid fa-circle-xmark"></i> No</span>';
 }
 
 // Helper: Calculate days between dates
@@ -122,10 +122,10 @@ function getDaysSince(isoDateString) {
 
   if (diffDays === 0) {
     const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-    if (diffHours === 0) return "Gerade eben";
-    return `Vor ${diffHours} Std.`;
+    if (diffHours === 0) return "Just now";
+    return `${diffHours} hrs ago`;
   }
-  return `Vor ${diffDays} Tag${diffDays > 1 ? 'en' : ''}`;
+  return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
 }
 
 // UI Update: Render Plant Cards
@@ -137,7 +137,7 @@ function renderPlants() {
     elPlantsGrid.innerHTML = `
       <div class="no-plants-placeholder">
         <i class="fa-solid fa-seedling"></i>
-        <p>Noch keine Pflanzen erfasst. Füge deine erste Pflanze hinzu!</p>
+        <p>No plants added yet. Add your first plant!</p>
       </div>
     `;
     return;
@@ -146,16 +146,16 @@ function renderPlants() {
   state.plants.forEach(plant => {
     // Determine card status styling
     let statusClass = "status-healthy";
-    let statusLabel = "GUT";
+    let statusLabel = "HEALTHY";
     let statusBadgeClass = "healthy";
 
     if (plant.status === "Water Now") {
       statusClass = "status-now";
-      statusLabel = "JETZT!";
+      statusLabel = "NOW!";
       statusBadgeClass = "now";
     } else if (plant.status === "Water Soon") {
       statusClass = "status-soon";
-      statusLabel = "BALD";
+      statusLabel = "SOON";
       statusBadgeClass = "soon";
     }
 
@@ -167,7 +167,7 @@ function renderPlants() {
     let formattedNextWatering = "-";
     if (plant.next_watering_date) {
       const nextDate = new Date(plant.next_watering_date);
-      formattedNextWatering = nextDate.toLocaleDateString("de-DE", { day: '2-digit', month: '2-digit' });
+      formattedNextWatering = nextDate.toLocaleDateString("en-US", { day: '2-digit', month: '2-digit' });
     }
 
     const imgUrl = plant.imageUrl && plant.imageUrl.trim() !== "" ? plant.imageUrl : FALLBACK_PLANT_IMAGE;
@@ -187,37 +187,37 @@ function renderPlants() {
       <div class="card-details">
         <div class="plant-title">
           <h3>${plant.name}</h3>
-          <span class="species">${plant.species || "Unbekannte Art"}</span>
+          <span class="species">${plant.species || "Unknown Species"}</span>
         </div>
         
         <div class="plant-stats">
           <div class="stat-row">
-            <span class="stat-label">Gegossen:</span>
+            <span class="stat-label">Watered:</span>
             <span class="stat-val">${getDaysSince(plant.lastWatered)}</span>
           </div>
           <div class="stat-row">
-            <span class="stat-label">Sonne/Tag:</span>
-            <span class="stat-val">${plant.sunHours} Std.</span>
+            <span class="stat-label">Sun/Day:</span>
+            <span class="stat-val">${plant.sunHours} hrs</span>
           </div>
           <div class="stat-row">
-            <span class="stat-label">Nächstes Gießen:</span>
+            <span class="stat-label">Next Watering:</span>
             <span class="stat-val" style="font-weight: 700;">${formattedNextWatering}</span>
           </div>
         </div>
         
-        <div class="ai-prediction-box" title="KI Analyse-Begründung">
-          ${plant.explanation || "Noch keine Analyse durchgeführt. Starte die KI-Analyse."}
-          ${plant.watering_tips ? `<div class="ai-watering-tips" style="margin-top: 6px; font-size: 0.72rem; color: #a5f3fc; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;"><i class="fa-solid fa-lightbulb"></i> <strong>Tipp:</strong> ${plant.watering_tips}</div>` : ""}
+        <div class="ai-prediction-box" title="AI Analysis Explanation">
+          ${plant.explanation || "No analysis run yet. Start the AI analysis."}
+          ${plant.watering_tips ? `<div class="ai-watering-tips" style="margin-top: 6px; font-size: 0.72rem; color: #a5f3fc; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;"><i class="fa-solid fa-lightbulb"></i> <strong>Tip:</strong> ${plant.watering_tips}</div>` : ""}
         </div>
         
         <div class="card-footer">
           <button class="btn btn-water btn-action-water" data-id="${plant.id}">
-            <i class="fa-solid fa-bucket"></i> Gegossen
+            <i class="fa-solid fa-bucket"></i> Watered
           </button>
-          <button class="btn btn-icon-only btn-edit-plant-icon btn-action-edit" data-id="${plant.id}" title="Bearbeiten">
+          <button class="btn btn-icon-only btn-edit-plant-icon btn-action-edit" data-id="${plant.id}" title="Edit">
             <i class="fa-solid fa-pen-to-square"></i>
           </button>
-          <button class="btn btn-icon-only btn-action-delete" data-id="${plant.id}" title="Löschen">
+          <button class="btn btn-icon-only btn-action-delete" data-id="${plant.id}" title="Delete">
             <i class="fa-solid fa-trash"></i>
           </button>
         </div>
@@ -251,7 +251,7 @@ function waterPlant(id) {
     state.plants[plantIndex].lastWatered = new Date().toISOString();
     state.plants[plantIndex].moisture_level = 100;
     state.plants[plantIndex].status = "Healthy";
-    state.plants[plantIndex].explanation = "Frisch gegossen! Die Erde ist voll gesättigt.";
+    state.plants[plantIndex].explanation = "Freshly watered! The soil is fully saturated.";
     state.plants[plantIndex].watering_tips = "";
     saveState();
     renderPlants();
@@ -261,7 +261,7 @@ function waterPlant(id) {
 // Action: Delete Plant
 function deletePlant(id) {
   const plant = state.plants.find(p => p.id === id);
-  if (plant && confirm(`Möchtest du die Pflanze "${plant.name}" wirklich entfernen?`)) {
+  if (plant && confirm(`Are you sure you want to remove the plant "${plant.name}"?`)) {
     state.plants = state.plants.filter(p => p.id !== id);
     saveState();
     renderPlants();
@@ -283,7 +283,7 @@ function openAddPlantModal() {
   fPlantImage.value = "";
   fPlantDesc.value = "";
 
-  document.getElementById("modal-plant-title").textContent = "Neue Pflanze hinzufügen";
+  document.getElementById("modal-plant-title").textContent = "Add New Plant";
   modalPlant.classList.add("show");
 }
 
@@ -305,7 +305,7 @@ function openEditPlantModal(id) {
   fPlantImage.value = plant.imageUrl || "";
   fPlantDesc.value = plant.description || "";
 
-  document.getElementById("modal-plant-title").textContent = "Pflanze bearbeiten";
+  document.getElementById("modal-plant-title").textContent = "Edit Plant";
   modalPlant.classList.add("show");
 }
 
@@ -401,12 +401,12 @@ formBalcony.addEventListener("submit", (e) => {
 // Action: Trigger AI Analysis
 async function triggerAIAnalysis() {
   if (state.plants.length === 0) {
-    alert("Füge bitte zuerst mindestens eine Pflanze hinzu, um die Analyse zu starten.");
+    alert("Please add at least one plant to start the analysis.");
     return;
   }
 
   // Show loading indicator
-  elLoadingText.textContent = `Hole Wetterdaten für ${state.balcony.city}...`;
+  elLoadingText.textContent = `Fetching weather data for ${state.balcony.city}...`;
   elLoadingOverlay.classList.add("show");
 
   const requestBody = {
@@ -428,7 +428,7 @@ async function triggerAIAnalysis() {
     : "";
 
   try {
-    elLoadingText.textContent = "KI Agenten bewerten Bodenfeuchtigkeit & Wasserbedarf...";
+    elLoadingText.textContent = "AI agents evaluating soil moisture & water needs...";
 
     const response = await fetch(`${apiBase}/api/analyze`, {
       method: "POST",
@@ -440,7 +440,7 @@ async function triggerAIAnalysis() {
 
     if (!response.ok) {
       const errData = await response.json();
-      throw new Error(errData.detail || "Serverfehler während der Analyse.");
+      throw new Error(errData.detail || "Server error during analysis.");
     }
 
     const data = await response.json();
@@ -461,12 +461,12 @@ async function triggerAIAnalysis() {
       saveState();
       renderPlants();
     } else {
-      throw new Error("Ungültiges Analyse-Ergebnis erhalten.");
+      throw new Error("Invalid analysis result received.");
     }
 
   } catch (error) {
     console.error("Analysis Error:", error);
-    alert(`Fehler bei der KI-Analyse: ${error.message}\n\nStelle sicher, dass der FastAPI Server läuft (Port 8000) und der GEMINI_API_KEY gesetzt ist.`);
+    alert(`Error during AI analysis: ${error.message}\n\nMake sure the FastAPI server is running (Port 8000) and the GEMINI_API_KEY is set.`);
   } finally {
     elLoadingOverlay.classList.remove("show");
   }
@@ -503,12 +503,12 @@ backupFileInput.addEventListener("change", (e) => {
         saveState();
         updateBalconyUI();
         renderPlants();
-        alert("Backup erfolgreich importiert!");
+        alert("Backup successfully imported!");
       } else {
-        throw new Error("Datenstruktur ist ungültig.");
+        throw new Error("Invalid data structure.");
       }
     } catch (err) {
-      alert("Fehler beim Laden des Backups: " + err.message);
+      alert("Error loading backup: " + err.message);
     }
   };
   reader.readAsText(file);

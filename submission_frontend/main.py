@@ -280,7 +280,7 @@ async def analyze_plant(
       "status": "{status}",
       "next_watering_date": "{next_watering_date}",
       "explanation": "<your 1-2 sentence English explanation>",
-      "watering_tips": "<a concise, actionable qualitative watering or care tip in German for this plant, e.g. 'Gieße am besten von unten, da die Erde stark ausgetrocknet ist...' or 'Vermeide Wasser auf den Blättern bei starker Mittagssonne...'>"
+      "watering_tips": "<a concise, actionable qualitative watering or care tip in English for this plant, e.g. 'Water from below as the soil is highly dried out...' or 'Avoid wetting the leaves during midday sun...'>"
     }}
     """
     
