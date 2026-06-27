@@ -224,42 +224,16 @@
       const DEFAULT_PLANTS = [
         {
           id: "default-1",
-          name: "Big Basil",
+          name: "Example Plant",
           species: "Water-loving Herbs",
-          lastWatered: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          sunHours: 6.0,
+          lastWatered: new Date().toISOString(),
+          sunHours: 0.0,
           imageUrl: "/img/App_Logo.svg",
-          description: "Main balcony, middle.",
-          moisture_level: 65,
+          description: "An example water-loving herb plant.",
+          moisture_level: 100,
           status: "Healthy",
-          next_watering_date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          explanation: "Basil has experienced moderate temperatures. It will need water in approximately 1 day."
-        },
-        {
-          id: "default-2",
-          name: "Hanging Strawberry",
-          species: "Fruits & Berries",
-          lastWatered: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-          sunHours: 5.0,
-          imageUrl: "/img/App_Logo.svg",
-          description: "On the left railing.",
-          moisture_level: 22,
-          status: "Water Now",
           next_watering_date: new Date().toISOString().split('T')[0],
-          explanation: "The strawberry has been dry for 4 days. Sun exposure has dried out the soil!"
-        },
-        {
-          id: "default-3",
-          name: "Little Aloe Vera",
-          species: "Succulents & Cacti",
-          lastWatered: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-          sunHours: 3.0,
-          imageUrl: "/img/App_Logo.svg",
-          description: "Top shadow shelf.",
-          moisture_level: 80,
-          status: "Healthy",
-          next_watering_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          explanation: "As a succulent, Aloe Vera consumes very little water. The soil is still damp enough."
+          explanation: "The plant was watered today and is fully hydrated."
         }
       ];
 
