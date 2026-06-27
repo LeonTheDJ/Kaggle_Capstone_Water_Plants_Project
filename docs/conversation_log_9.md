@@ -94,6 +94,9 @@ We added and committed all changes using the Git Commit Version skill helper scr
 7. **Commit 7 (GCP Coupling Documentation):**
    - Added coupling instructions for custom Google Cloud projects in the project README.md.
    - Message: `docs: add Google Cloud coupling section to README.md`
+8. **Commit 8 (README Clarification):**
+   - Clarified the distinction between local `.env` configuration (Gemini API key) and Google Cloud environment configurations in the README.
+   - Message: `docs: clarify local env and GCP configuration in README.md`
 
 ---
 
@@ -101,6 +104,7 @@ We added and committed all changes using the Git Commit Version skill helper scr
 
 | Hash | Message |
 |------|---------|
+| `1cd4451` | `docs: clarify local env and GCP configuration in README.md` |
 | `de666eb` | `docs: add Google Cloud coupling section to README.md` |
 | `d4d49e9` | `docs: document GCP credentials and template checks in safety skills` |
 | `0d55f3d` | `docs: add comprehensive project README.md` |
@@ -122,3 +126,4 @@ We added and committed all changes using the Git Commit Version skill helper scr
 | 2026-06-27 | Antigravity | Documented final project README.md creation and git commit. |
 | 2026-06-27 | Antigravity | Documented GCP credentials and templates checks in skills. |
 | 2026-06-27 | Antigravity | Documented Google Cloud coupling steps in README.md. |
+| 2026-06-27 | Antigravity | Clarified local env setup vs GCP coupling in README.md. |
