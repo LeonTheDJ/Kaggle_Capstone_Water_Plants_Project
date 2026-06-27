@@ -22,6 +22,14 @@ description: Chat‑only safety‑check guidelines. Use during reviews to ensure
    - Ensure other credential files (e.g., `credentials.json`) are also ignored.
 5. **Hard‑Coded URLs with Tokens**
    - Verify URLs do not embed tokens or API keys as query parameters.
+6. **No Real Google Cloud Project Details**
+   - Confirm that no real GCP Project IDs, project numbers, or specific Reasoning Engine resource IDs are committed.
+   - All such values must be replaced with generic placeholders (e.g., `<YOUR_GCP_PROJECT_ID>`, `<YOUR_GCP_PROJECT_NUMBER>`, `<YOUR_REASONING_ENGINE_ID>`).
+7. **GCP Service Account Keys & API Keys**
+   - Search for Google Cloud Service Account JSON credentials containing `"private_key"` or `-----BEGIN PRIVATE KEY-----`.
+   - Search for Google API Key prefixes like `AIzaSy`.
+8. **Clean Configuration Templates**
+   - Confirm that `.env.example`, `*.tfvars`, and other shared configuration templates only contain placeholder text.
 
 ## How to Apply in Chat
 - When reviewing a PR or a new file, copy‑paste the file content into the chat and ask the assistant to run a **Safety‑Check** using the checklist above.

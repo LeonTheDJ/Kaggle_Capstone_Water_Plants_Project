@@ -14,7 +14,7 @@ In diesem Dokument werden alle im Projekt definierten Skills sowie die globalen 
 
 ### [git-commit-version](../skills/git-commit-version/SKILL.md)
 *   **Commit-Namenskonvention:** Erzwingt das Format `<type>: <description>` für reguläre Commits und verlangt ein vorangestelltes Ausrufezeichen `!` für Breaking Changes bzw. spezielle Commits.
-*   **Sicherheitsprüfungen vor dem Commit (Pre-Commit-Checks):** Verhindert das Committen von Code, der absolute lokale Pfade oder hartkodierte Zugangsdaten/Geheimnisse (z. B. `GEMINI_API_KEY`) enthält, und stellt sicher, dass `.env` nicht im Git-Index getrackt wird.
+*   **Sicherheitsprüfungen vor dem Commit (Pre-Commit-Checks):** Verhindert das Committen von Code, der absolute lokale Pfade, hartkodierte Zugangsdaten (wie API-Keys), Google Cloud Dienstkontoschlüssel (`private_key`), oder ungefilterte Konfigurationsvorlagen enthält, und stellt sicher, dass `.env` nicht im Git-Index getrackt wird.
 *   **Automatisierungsskript:** Verwendet das Helper-Skript [safe_commit.py](../skills/git-commit-version/scripts/safe_commit.py), um diese Prüfungen automatisiert auszuführen und fehlerhafte Commits abzubrechen.
 
 ### [prompt-documentation-skill](../skills/prompt-documentation-skill/SKILL.md)
@@ -26,7 +26,7 @@ In diesem Dokument werden alle im Projekt definierten Skills sowie die globalen 
 
 ### [safety-check-skill](../skills/safety-check-skill/SKILL.md)
 *   **Manuelle Sicherheitsprüfung (Chat-Only):** Dient als Quick-Checkliste zur manuellen Verifizierung von Code auf Sicherheitsrisiken vor der Übergabe oder Veröffentlichung.
-*   **Sicherheitskriterien:** Prüft auf die Einhaltung relativer Pfade, das Fehlen von Passwörtern, Secrets, API-Keys in den Quelltexten sowie auf nicht getrackte `.env`-Dateien und URLs mit Token-Parametern.
+*   **Sicherheitskriterien:** Prüft auf relative Pfade, das Fehlen von Passwörtern, Secrets, API-Keys (z. B. `AIzaSy`), GCP Service Account JSONs (`private_key`), nicht getrackte `.env`-Dateien, URLs mit Token-Parametern und saubere Konfigurationsvorlagen (wie `.env.example` und `*.tfvars`).
 *   **Interaktive Anwendung:** Ermöglicht es dem Entwickler, Code im Chat prüfen zu lassen, woraufhin der Agent gezielte Hinweise auf Sicherheitslücken gibt.
 
 ---

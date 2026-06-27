@@ -32,6 +32,9 @@ The safety check consists of:
 1. **No Absolute Paths**: No file containing staged changes should contain absolute local paths (e.g., `C:\Users\<username>\...` or `C:/Users/<username>/...`). All paths must be relative to the workspace.
 2. **No Hardcoded Secrets**: Ensure no active secrets (like `GEMINI_API_KEY="AQ..."` or other credential tokens) are included in the source files. They must reside in `.env` (which is git-ignored) or be provided dynamically.
 3. **Ignored `.env`**: Confirm `.env` is not tracked by Git.
+4. **No GCP Service Account Keys or Certificates**: Scan staged files for patterns like `"private_key"`, `-----BEGIN PRIVATE KEY-----`, or certificate file extensions (`.pem`, `.p12`).
+5. **No Google API Keys**: Ensure no Google Cloud/Gemini API keys (typically starting with `AIzaSy`) are hardcoded.
+6. **Clean Config Templates**: Confirm that shared templates (such as `.env.example` or `*.tfvars` files) only contain generic placeholders and no real environment variables.
 
 ---
 
