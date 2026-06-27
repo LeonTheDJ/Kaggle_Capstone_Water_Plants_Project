@@ -32,7 +32,7 @@ except Exception as e:
 import vertexai
 from vertexai import agent_engines
 
-app = FastAPI(title="FloraCast Presentation Dashboard", version="0.1.0")
+app = FastAPI(title="FloraWave Presentation Dashboard", version="0.1.0")
 
 # Setup CORS
 app.add_middleware(
@@ -252,9 +252,9 @@ async def analyze_plant(
     sum_rain_recent = sum(weather_data["precipitation_sum_mm"])
     weather_summary = f"Mean temp: {round(avg_temp_recent, 1)}°C, Total rain: {round(sum_rain_recent, 1)}mm"
     
-    # 5. Format prompt to obtain the German explanation from the Agent
+    # 5. Format prompt to obtain the English explanation from the Agent
     prompt = f"""
-    You are the FloraCast Botanical Assistant. Provide a 1-2 sentence German explanation for the watering recommendation of this plant:
+    You are the FloraWave Botanical Assistant. Provide a 1-2 sentence English explanation for the watering recommendation of this plant:
     - Plant Name: {plant_name}
     - Species/Category: {species}
     - Calculated Soil Moisture: {moisture_level}%
@@ -276,7 +276,7 @@ async def analyze_plant(
       "moisture_level": {moisture_level},
       "status": "{status}",
       "next_watering_date": "{next_watering_date}",
-      "explanation": "<your 1-2 sentence German explanation>"
+      "explanation": "<your 1-2 sentence English explanation>"
     }}
     """
     
@@ -359,7 +359,7 @@ if os.path.exists(static_dir):
 else:
     @app.get("/")
     def read_root():
-        return {"message": "FloraCast Presentation Dashboard is running. Build static folder to view frontend."}
+        return {"message": "FloraWave Presentation Dashboard is running. Build static folder to view frontend."}
 
 if __name__ == "__main__":
     import uvicorn

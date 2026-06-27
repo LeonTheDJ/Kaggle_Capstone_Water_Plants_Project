@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="FloraCast Dashboard - AI-powered plant-watering advisor." />
-    <title>FloraCast // Premium AI Plant Advisor</title>
+    <meta name="description" content="FloraWave Dashboard - AI-powered plant-watering advisor." />
+    <title>FloraWave // Premium AI Plant Advisor</title>
     
     <!-- Google Fonts: Outfit & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,8 +23,8 @@
       
       <header class="app-header">
         <div class="logo">
-          <i class="fa-solid fa-seedling header-leaf animate-float"></i>
-          <h1>Flora<span>Cast</span></h1>
+          <img src="/img/App_Logo.svg" alt="FloraWave Logo" class="header-logo animate-float" />
+          <h1>Flora<span>Wave</span></h1>
         </div>
         <p class="subtitle">AI-Powered Watering Recommendations & Weather Insights</p>
       </header>
@@ -259,8 +259,8 @@
 
       // App State
       let state = {
-        plants: JSON.parse(localStorage.getItem("floracast_plants")) || DEFAULT_PLANTS,
-        balcony: JSON.parse(localStorage.getItem("floracast_balcony")) || DEFAULT_BALCONY
+        plants: JSON.parse(localStorage.getItem("florawave_plants")) || JSON.parse(localStorage.getItem("floracast_plants")) || DEFAULT_PLANTS,
+        balcony: JSON.parse(localStorage.getItem("florawave_balcony")) || JSON.parse(localStorage.getItem("floracast_balcony")) || DEFAULT_BALCONY
       };
 
       // DOM Elements
@@ -281,8 +281,8 @@
 
       // Save to localStorage
       function saveState() {
-        localStorage.setItem("floracast_plants", JSON.stringify(state.plants));
-        localStorage.setItem("floracast_balcony", JSON.stringify(state.balcony));
+        localStorage.setItem("florawave_plants", JSON.stringify(state.plants));
+        localStorage.setItem("florawave_balcony", JSON.stringify(state.balcony));
       }
 
       // Render Balcony Info

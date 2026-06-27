@@ -1,7 +1,7 @@
 [project]
 name = "submission_frontend"
 version = "0.1.0"
-description = "FloraCast English Presentation Dashboard"
+description = "FloraWave English Presentation Dashboard"
 requires-python = ">=3.11,<3.14"
 dependencies = [
     "fastapi>=0.110.0",
