@@ -88,6 +88,9 @@ We added and committed all changes using the Git Commit Version skill helper scr
 5. **Commit 5 (Project README.md):**
    - Created a comprehensive project [README.md](../README.md) in the workspace root detailing setup and deployment.
    - Message: `docs: add comprehensive project README.md`
+6. **Commit 6 (GCP Security Checklist Documentation):**
+   - Updated the safety check checklists and documentation to include GCP service account keys, API keys, and configurations.
+   - Message: `docs: document GCP credentials and template checks in safety skills`
 
 ---
 
@@ -95,6 +98,7 @@ We added and committed all changes using the Git Commit Version skill helper scr
 
 | Hash | Message |
 |------|---------|
+| `d4d49e9` | `docs: document GCP credentials and template checks in safety skills` |
 | `0d55f3d` | `docs: add comprehensive project README.md` |
 | `50847ad` | `feat: add mock plant images to test_content_assets` |
 | `46599a3` | `fix: resolve Cloud Run moisture calculation imports and plant edit form url validation` |
@@ -112,3 +116,4 @@ We added and committed all changes using the Git Commit Version skill helper scr
 | 2026-06-27 | Antigravity | Updated Log 9 to document local image upload, moisture calculation path fixes, and form validation fixes. |
 | 2026-06-27 | Antigravity | Added test content assets commit documentation. |
 | 2026-06-27 | Antigravity | Documented final project README.md creation and git commit. |
+| 2026-06-27 | Antigravity | Documented GCP credentials and templates checks in skills. |
