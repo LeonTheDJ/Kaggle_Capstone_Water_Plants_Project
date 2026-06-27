@@ -149,11 +149,11 @@ async def analyze_plant(
         session_id = f"sess-{int(datetime.datetime.now().timestamp())}"
         logger.info(f"Creating session: {session_id} for user default-user")
         
-        session = agent_engine.create_session(user_id="default-user")
+        session = await agent_engine.async_create_session(user_id="default-user")
         sess_uuid = session["id"]
         
-        logger.info(f"Querying deployed agent with stream_query...")
-        response = agent_engine.stream_query(
+        logger.info(f"Querying deployed agent with async_stream_query...")
+        response = agent_engine.async_stream_query(
             session_id=sess_uuid,
             message=prompt,
             user_id="default-user"
@@ -161,7 +161,7 @@ async def analyze_plant(
         
         # Parse the response text from streamed chunks
         response_text = ""
-        for chunk in response:
+        async for chunk in response:
             if hasattr(chunk, 'content') and chunk.content:
                 for part in chunk.content.parts:
                     if hasattr(part, 'text') and part.text:

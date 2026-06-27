@@ -75,6 +75,9 @@
 
         <!-- Action Row -->
         <div class="action-row">
+          <button id="btn-reset-defaults" class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.05); color: #ff5f5f; border-color: rgba(239, 68, 68, 0.2); margin-right: auto;">
+            <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+          </button>
           <button id="btn-add-plant" class="btn btn-primary">
             <i class="fa-solid fa-plus"></i> Add Plant
           </button>
@@ -359,33 +362,12 @@
           `;
         }).join("");
 
-        // Attach event listeners to card actions
-        document.querySelectorAll(".btn-delete-plant").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const id = btn.getAttribute("data-id");
-            deletePlant(id);
-          });
-        });
-
-        document.querySelectorAll(".btn-analyze-single").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const id = btn.getAttribute("data-id");
-            analyzeSinglePlant(id);
-          });
-        });
-
-        document.querySelectorAll(".btn-edit-plant").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const id = btn.getAttribute("data-id");
-            openEditPlantModal(id);
-          });
-        });
       }
 
       // Delete Plant
       function deletePlant(id) {
         if (confirm("Are you sure you want to remove this plant?")) {
-          state.plants = state.plants.filter(p => p.id !== id);
+          state.plants = state.plants.filter(p => String(p.id) !== String(id));
           saveState();
           renderPlants();
           updateThirstyPlants();
@@ -646,6 +628,36 @@
         renderBalcony();
         updateWeather();
         closeModal();
+      });
+
+      document.getElementById("btn-reset-defaults").addEventListener("click", () => {
+        if (confirm("Reset balcony settings and plant inventory to original defaults? All local edits will be cleared.")) {
+          state.plants = DEFAULT_PLANTS;
+          state.balcony = DEFAULT_BALCONY;
+          saveState();
+          renderBalcony();
+          renderPlants();
+          updateWeather();
+          updateThirstyPlants();
+        }
+      });
+
+      // Delegated event listener for plant card actions
+      plantsGrid.addEventListener("click", (e) => {
+        const btnDelete = e.target.closest(".btn-delete-plant");
+        const btnAnalyze = e.target.closest(".btn-analyze-single");
+        const btnEdit = e.target.closest(".btn-edit-plant");
+
+        if (btnDelete) {
+          const id = btnDelete.getAttribute("data-id");
+          deletePlant(id);
+        } else if (btnAnalyze) {
+          const id = btnAnalyze.getAttribute("data-id");
+          analyzeSinglePlant(id);
+        } else if (btnEdit) {
+          const id = btnEdit.getAttribute("data-id");
+          openEditPlantModal(id);
+        }
       });
 
       // Initial Setup
