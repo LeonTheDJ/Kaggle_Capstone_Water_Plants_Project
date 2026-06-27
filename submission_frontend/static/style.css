@@ -482,6 +482,33 @@ textarea {
   transition: var(--transition-smooth);
   width: 100%;
 }
+input[type="file"] {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  transition: var(--transition-smooth);
+  width: 100%;
+  cursor: pointer;
+}
+input[type="file"]::file-selector-button {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-glass);
+  border-radius: 6px;
+  color: var(--text-primary);
+  padding: 0.25rem 0.6rem;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  transition: var(--transition-smooth);
+}
+input[type="file"]::file-selector-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--border-focus);
