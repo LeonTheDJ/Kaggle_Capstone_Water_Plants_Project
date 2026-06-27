@@ -9,18 +9,18 @@ const DEFAULT_PLANTS = [
     lastWatered: new Date().toISOString(),
     sunHours: 0.0,
     imageUrl: "/img/App_Logo.svg",
-    description: "Ein Beispiel für eine wasserliebende Kräuterpflanze.",
+    description: "An example of a water-loving herb plant.",
     moisture_level: 100,
     status: "Healthy",
     next_watering_date: new Date().toISOString().split('T')[0],
-    explanation: "Die Pflanze wurde heute gegossen und ist vollständig hydriert.",
-    watering_tips: "Die Erde ist feucht. Vorerst kein Gießen nötig."
+    explanation: "The plant was watered today and is fully hydrated.",
+    watering_tips: "The soil is moist. No watering needed for now."
   }
 ];
 
 const DEFAULT_BALCONY = {
-  city: "München",
-  zipCode: "80331",
+  city: "Berlin",
+  zipCode: "10967",
   defaultSunHours: 5.0,
   isCovered: false
 };
