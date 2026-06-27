@@ -151,28 +151,29 @@ async def analyze_plant(
         session = agent_engine.create_session(user_id="default-user")
         sess_uuid = session["id"]
         
-        logger.info(f"Querying deployed agent with prompt...")
-        response = agent_engine.query(
+        logger.info(f"Querying deployed agent with stream_query...")
+        response = agent_engine.stream_query(
             session_id=sess_uuid,
             message=prompt,
             user_id="default-user"
         )
         
-        # Parse the response text
+        # Parse the response text from streamed chunks
         response_text = ""
-        if hasattr(response, 'content') and response.content:
-            for part in response.content.parts:
-                if hasattr(part, 'text') and part.text:
-                    response_text += part.text
-        elif isinstance(response, dict):
-            content = response.get("content", {})
-            if isinstance(content, dict):
-                parts = content.get("parts", [])
-                for part in parts:
-                    if "text" in part:
-                        response_text += part["text"]
-            elif isinstance(content, str):
-                response_text = content
+        for chunk in response:
+            if hasattr(chunk, 'content') and chunk.content:
+                for part in chunk.content.parts:
+                    if hasattr(part, 'text') and part.text:
+                        response_text += part.text
+            elif isinstance(chunk, dict):
+                content = chunk.get("content", {})
+                if isinstance(content, dict):
+                    parts = content.get("parts", [])
+                    for part in parts:
+                        if "text" in part:
+                            response_text += part["text"]
+                elif isinstance(content, str):
+                    response_text += content
         
         logger.info(f"Raw agent response: {response_text}")
         

@@ -30,72 +30,68 @@
       </header>
 
       <main class="container">
-        <!-- Balcony Profile Header Card -->
-        <section class="control-panel glass">
-          <div class="balcony-header-row">
-            <div class="balcony-profile-info">
-              <h3><i class="fa-solid fa-cloud-sun"></i> Balcony Profile</h3>
-              <div class="balcony-info-grid">
-                <div>
-                  <span class="label">Location:</span>
-                  <span id="display-location" class="val">Munich</span>
-                </div>
-                <div>
-                  <span class="label">Default Sun Exposure:</span>
-                  <span id="display-sun" class="val">5.0 hrs/day</span>
-                </div>
-                <div>
-                  <span class="label">Balcony Type:</span>
-                  <span id="display-covered" class="val">Open (Rain exposed)</span>
-                </div>
+        <!-- Top Row Layout: Balcony, Current Weather, Thirsty Plants -->
+        <div class="top-row">
+          <!-- Balcony Profile Widget -->
+          <section class="balcony-widget glass">
+            <h3><i class="fa-solid fa-house-chimney-window"></i> Balcony</h3>
+            <div class="balcony-info-grid">
+              <div>
+                <span class="label">Location:</span>
+                <span id="display-location" class="val">Munich</span>
+              </div>
+              <div>
+                <span class="label">Sun Exposure:</span>
+                <span id="display-sun" class="val">5.0 hrs/day</span>
+              </div>
+              <div>
+                <span class="label">Balcony Type:</span>
+                <span id="display-covered" class="val">Open</span>
               </div>
             </div>
-            
-            <div class="balcony-actions">
-              <button id="btn-edit-balcony" class="btn btn-secondary">
-                <i class="fa-solid fa-gear"></i> Edit Balcony
+            <div class="balcony-btn-row">
+              <button id="btn-edit-balcony" class="btn btn-secondary btn-xs">
+                <i class="fa-solid fa-gear"></i> Settings
               </button>
-              <button id="btn-add-plant" class="btn btn-primary">
-                <i class="fa-solid fa-plus"></i> Add Plant
-              </button>
-              <button id="btn-analyze-all" class="btn btn-accent">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Run AI Analysis
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Main Body Grid: Plants on Left, Weather & Sessions on Right -->
-        <div class="grid-layout">
-          <!-- Plants List Section -->
-          <section class="plants-section">
-            <div class="section-header">
-              <h2>My Plants (<span id="plant-count">0</span>)</h2>
-            </div>
-            <div id="plants-grid" class="plants-grid scrollable-y">
-              <!-- Dynamic Plant Cards will be injected here -->
             </div>
           </section>
 
-          <!-- Side Widgets Column -->
-          <div class="side-column">
-            <!-- Weather Card -->
-            <section class="weather-card glass" id="weather-widget">
-              <h3><i class="fa-solid fa-cloud-sun"></i> Live Weather</h3>
-              <div class="weather-content loading-placeholder">
-                <p>Loading weather data...</p>
-              </div>
-            </section>
+          <!-- Current Weather Widget -->
+          <section class="weather-widget glass" id="weather-widget">
+            <h3><i class="fa-solid fa-cloud-sun"></i> Current Weather</h3>
+            <div class="weather-content loading-placeholder">
+              <p>Loading weather data...</p>
+            </div>
+          </section>
 
-            <!-- Active Sessions Card -->
-            <section class="sessions-card glass">
-              <h3><i class="fa-solid fa-history"></i> Recent AI Sessions</h3>
-              <div class="sessions-list scrollable-y" id="sessions-container">
-                <p class="empty-sessions">No sessions analyzed yet.</p>
-              </div>
-            </section>
-          </div>
+          <!-- Thirsty Plants Widget -->
+          <section class="thirsty-widget glass">
+            <h3><i class="fa-solid fa-droplet-slash"></i> Thirsty Plants</h3>
+            <div class="thirsty-content scrollable-y" id="thirsty-container">
+              <p class="empty-thirsty">All plants are well hydrated!</p>
+            </div>
+          </section>
         </div>
+
+        <!-- Action Row -->
+        <div class="action-row">
+          <button id="btn-add-plant" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Add Plant
+          </button>
+          <button id="btn-analyze-all" class="btn btn-accent">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Run AI Analysis
+          </button>
+        </div>
+
+        <!-- Plants Grid Section -->
+        <section class="plants-section">
+          <div class="section-header">
+            <h2>My Plants (<span id="plant-count">0</span>)</h2>
+          </div>
+          <div id="plants-grid" class="plants-grid">
+            <!-- Dynamic Plant Cards will be injected here -->
+          </div>
+        </section>
       </main>
 
       <!-- Modal: Add / Edit Plant -->
@@ -269,7 +265,9 @@
       const modalBalcony = document.getElementById("modal-balcony");
       const loadingOverlay = document.getElementById("loading-overlay");
       const loadingText = document.getElementById("loading-text");
-      const sessionsContainer = document.getElementById("sessions-container");
+      
+      const weatherWidget = document.getElementById("weather-widget");
+      const thirstyContainer = document.getElementById("thirsty-container");
 
       // Save to localStorage
       function saveState() {
@@ -281,7 +279,7 @@
       function renderBalcony() {
         displayLocation.textContent = `${state.balcony.city} (${state.balcony.zipCode})`;
         displaySun.textContent = `${state.balcony.defaultSunHours} hrs/day`;
-        displayCovered.textContent = state.balcony.isCovered ? "Covered (No Rain)" : "Open (Rain exposed)";
+        displayCovered.textContent = state.balcony.isCovered ? "Covered" : "Open";
       }
 
       // Render Plant Cards
@@ -301,7 +299,14 @@
         plantsGrid.innerHTML = state.plants.map(plant => {
           const defaultImg = "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300&auto=format&fit=crop&q=80";
           const imgUrl = plant.imageUrl || defaultImg;
-          const lastWateredDate = new Date(plant.lastWatered).toLocaleString();
+          
+          // Try to safely format date
+          let lastWateredDate = "Unknown";
+          if (plant.lastWatered) {
+            try {
+              lastWateredDate = new Date(plant.lastWatered).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+            } catch(e) {}
+          }
           
           const moisture = plant.moisture_level !== undefined ? `${plant.moisture_level}%` : "Not analyzed";
           const status = plant.status || "Healthy";
@@ -316,7 +321,7 @@
                   <span class="badge badge-${statusClass}">${status}</span>
                 </div>
                 <p class="plant-category"><i class="fa-solid fa-tag"></i> ${plant.species}</p>
-                <p class="plant-meta"><strong>Sun Exposure:</strong> ${plant.sunHours} hrs/day</p>
+                <p class="plant-meta"><strong>Sun:</strong> ${plant.sunHours} hrs/day</p>
                 <p class="plant-meta"><strong>Last Watered:</strong> ${lastWateredDate}</p>
                 
                 <div class="plant-moisture-bar">
@@ -330,10 +335,13 @@
                 ${plant.next_watering_date ? `<p class="plant-meta"><strong>Next Watering:</strong> ${plant.next_watering_date}</p>` : ""}
 
                 <div class="plant-actions">
-                  <button class="btn btn-secondary btn-xs btn-analyze-single" data-id="${plant.id}">
+                  <button class="btn btn-secondary btn-xs btn-analyze-single" data-id="${plant.id}" title="Run AI analysis">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze
                   </button>
-                  <button class="btn btn-danger btn-xs btn-delete-plant" data-id="${plant.id}">
+                  <button class="btn btn-secondary btn-xs btn-edit-plant" data-id="${plant.id}" title="Edit plant values">
+                    <i class="fa-solid fa-pen"></i> Edit
+                  </button>
+                  <button class="btn btn-danger btn-xs btn-delete-plant" data-id="${plant.id}" title="Remove plant">
                     <i class="fa-solid fa-trash"></i> Delete
                   </button>
                 </div>
@@ -344,16 +352,23 @@
 
         // Attach event listeners to card actions
         document.querySelectorAll(".btn-delete-plant").forEach(btn => {
-          btn.addEventListener("click", (e) => {
+          btn.addEventListener("click", () => {
             const id = btn.getAttribute("data-id");
             deletePlant(id);
           });
         });
 
         document.querySelectorAll(".btn-analyze-single").forEach(btn => {
-          btn.addEventListener("click", (e) => {
+          btn.addEventListener("click", () => {
             const id = btn.getAttribute("data-id");
             analyzeSinglePlant(id);
+          });
+        });
+
+        document.querySelectorAll(".btn-edit-plant").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const id = btn.getAttribute("data-id");
+            openEditPlantModal(id);
           });
         });
       }
@@ -364,7 +379,36 @@
           state.plants = state.plants.filter(p => p.id !== id);
           saveState();
           renderPlants();
+          updateThirstyPlants();
         }
+      }
+
+      // Open Edit Plant Modal
+      function openEditPlantModal(id) {
+        const plant = state.plants.find(p => p.id === id);
+        if (!plant) return;
+
+        document.getElementById("field-plant-id").value = plant.id;
+        document.getElementById("field-plant-name").value = plant.name;
+        document.getElementById("field-plant-species").value = plant.species;
+        document.getElementById("field-plant-sun").value = plant.sunHours;
+        
+        // Format ISO date string to match YYYY-MM-DDThh:mm for datetime-local
+        let dateVal = "";
+        if (plant.lastWatered) {
+          try {
+            dateVal = new Date(plant.lastWatered).toISOString().slice(0, 16);
+          } catch(e) {
+            dateVal = new Date().toISOString().slice(0, 16);
+          }
+        }
+        document.getElementById("field-plant-last-watered").value = dateVal;
+        
+        document.getElementById("field-plant-image").value = plant.imageUrl || "";
+        document.getElementById("field-plant-desc").value = plant.description || "";
+
+        document.getElementById("modal-plant-title").textContent = "Edit Plant Details";
+        modalPlant.classList.add("show");
       }
 
       // Fetch Weather details
@@ -375,7 +419,7 @@
           const data = await res.json();
           
           weatherWidget.innerHTML = `
-            <h3><i class="fa-solid fa-cloud-sun animate-pulse"></i> Live Weather in ${data.city}</h3>
+            <h3><i class="fa-solid fa-cloud-sun"></i> Current Weather in ${data.city}</h3>
             <div class="weather-grid">
               <div class="weather-metric">
                 <span class="lbl">Temperature</span>
@@ -396,40 +440,31 @@
           `;
         } catch (err) {
           weatherWidget.innerHTML = `
-            <h3><i class="fa-solid fa-triangle-exclamation"></i> Weather Info</h3>
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> Current Weather</h3>
             <p class="error-msg">Could not load weather details for "${state.balcony.city}".</p>
           `;
         }
       }
 
-      // Fetch Sessions List
-      async function updateSessions() {
-        try {
-          const res = await fetch(`${API_BASE}/api/sessions`);
-          if (!res.ok) throw new Error("Sessions fetch failed");
-          const sessions = await res.json();
-          
-          if (sessions.length === 0) {
-            sessionsContainer.innerHTML = '<p class="empty-sessions">No sessions analyzed yet.</p>';
-            return;
-          }
-
-          sessionsContainer.innerHTML = sessions.map(s => `
-            <div class="session-item">
-              <div class="session-header-row">
-                <span class="sess-title">${s.plant_name} (${s.species})</span>
-                <span class="badge badge-${s.status.toLowerCase().replace(" ", "-")}">${s.status}</span>
-              </div>
-              <div class="sess-meta">
-                <span>Moisture: ${s.moisture_level}%</span> | 
-                <span>ID: ${s.session_id.substring(0, 15)}...</span>
-              </div>
-              <div class="sess-explanation">${s.explanation}</div>
-            </div>
-          `).join("");
-        } catch (err) {
-          console.error("Failed to load sessions:", err);
+      // Update Thirsty Plants Panel
+      function updateThirstyPlants() {
+        // Filter plants that are dry (Water Now status)
+        const thirsty = state.plants.filter(p => p.status === "Water Now");
+        
+        if (thirsty.length === 0) {
+          thirstyContainer.innerHTML = '<p class="empty-thirsty">All plants are well hydrated!</p>';
+          return;
         }
+
+        thirstyContainer.innerHTML = thirsty.map(p => {
+          const moisture = p.moisture_level !== undefined ? `${p.moisture_level}%` : "0%";
+          return `
+            <div class="thirsty-item">
+              <span class="thirsty-name"><i class="fa-solid fa-droplet animate-pulse"></i> ${p.name}</span>
+              <span class="thirsty-moisture">Moisture: ${moisture}</span>
+            </div>
+          `;
+        }).join("");
       }
 
       // Analyze Single Plant
@@ -466,7 +501,7 @@
 
           saveState();
           renderPlants();
-          await updateSessions();
+          updateThirstyPlants();
 
         } catch (err) {
           alert(`Analysis failed for ${plant.name}: ${err.message}`);
@@ -485,7 +520,6 @@
         for (const plant of state.plants) {
           await analyzeSinglePlant(plant.id);
         }
-        await updateWeather();
       });
 
       // Modals Logic
@@ -511,6 +545,7 @@
         const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
         dateInput.value = oneDayAgo.toISOString().slice(0, 16);
 
+        document.getElementById("modal-plant-title").textContent = "Add New Plant";
         modalPlant.classList.add("show");
       });
 
@@ -547,29 +582,41 @@
         const imageUrl = document.getElementById("field-plant-image").value.trim();
         const description = document.getElementById("field-plant-desc").value.trim();
 
-        const plantData = {
-          id,
-          name,
-          species,
-          sunHours,
-          lastWatered,
-          imageUrl,
-          description,
-          status: "Healthy",
-          moisture_level: undefined,
-          next_watering_date: undefined,
-          explanation: undefined
-        };
-
         const existingIdx = state.plants.findIndex(p => p.id === id);
+        
         if (existingIdx !== -1) {
-          state.plants[existingIdx] = plantData;
+          // Edit: update fields but preserve old analysis values if not analyzed again
+          const oldPlant = state.plants[existingIdx];
+          state.plants[existingIdx] = {
+            ...oldPlant,
+            name,
+            species,
+            sunHours,
+            lastWatered,
+            imageUrl,
+            description
+          };
         } else {
+          // Add New
+          const plantData = {
+            id,
+            name,
+            species,
+            sunHours,
+            lastWatered,
+            imageUrl,
+            description,
+            status: "Healthy",
+            moisture_level: undefined,
+            next_watering_date: undefined,
+            explanation: undefined
+          };
           state.plants.push(plantData);
         }
 
         saveState();
         renderPlants();
+        updateThirstyPlants();
         closeModal();
       });
 
@@ -592,7 +639,7 @@
       renderBalcony();
       renderPlants();
       updateWeather();
-      updateSessions();
+      updateThirstyPlants();
     </script>
   </body>
 </html>
