@@ -13,7 +13,8 @@ const DEFAULT_PLANTS = [
     moisture_level: 100,
     status: "Healthy",
     next_watering_date: new Date().toISOString().split('T')[0],
-    explanation: "Die Pflanze wurde heute gegossen und ist vollständig hydriert."
+    explanation: "Die Pflanze wurde heute gegossen und ist vollständig hydriert.",
+    watering_tips: "Die Erde ist feucht. Vorerst kein Gießen nötig."
   }
 ];
 
@@ -107,8 +108,8 @@ function saveState() {
 function updateBalconyUI() {
   elDisplayLocation.textContent = `${state.balcony.city} (${state.balcony.zipCode})`;
   elDisplaySun.textContent = `${state.balcony.defaultSunHours} Std.`;
-  elDisplayCovered.innerHTML = state.balcony.isCovered 
-    ? '<span class="status-yes"><i class="fa-solid fa-circle-check"></i> Ja</span>' 
+  elDisplayCovered.innerHTML = state.balcony.isCovered
+    ? '<span class="status-yes"><i class="fa-solid fa-circle-check"></i> Ja</span>'
     : '<span class="status-no"><i class="fa-solid fa-circle-xmark"></i> Nein</span>';
 }
 
@@ -118,7 +119,7 @@ function getDaysSince(isoDateString) {
   const now = new Date();
   const diffTime = Math.abs(now - date);
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays === 0) {
     const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
     if (diffHours === 0) return "Gerade eben";
@@ -206,6 +207,7 @@ function renderPlants() {
         
         <div class="ai-prediction-box" title="KI Analyse-Begründung">
           ${plant.explanation || "Noch keine Analyse durchgeführt. Starte die KI-Analyse."}
+          ${plant.watering_tips ? `<div class="ai-watering-tips" style="margin-top: 6px; font-size: 0.72rem; color: #a5f3fc; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;"><i class="fa-solid fa-lightbulb"></i> <strong>Tipp:</strong> ${plant.watering_tips}</div>` : ""}
         </div>
         
         <div class="card-footer">
@@ -250,6 +252,7 @@ function waterPlant(id) {
     state.plants[plantIndex].moisture_level = 100;
     state.plants[plantIndex].status = "Healthy";
     state.plants[plantIndex].explanation = "Frisch gegossen! Die Erde ist voll gesättigt.";
+    state.plants[plantIndex].watering_tips = "";
     saveState();
     renderPlants();
   }
@@ -271,15 +274,15 @@ function openAddPlantModal() {
   fPlantName.value = "";
   fPlantSpecies.value = "";
   fPlantSun.value = state.balcony.defaultSunHours; // Suggest balcony default
-  
+
   // Set default datetime-local to current local time
   const now = new Date();
   now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
   fPlantLastWatered.value = now.toISOString().slice(0, 16);
-  
+
   fPlantImage.value = "";
   fPlantDesc.value = "";
-  
+
   document.getElementById("modal-plant-title").textContent = "Neue Pflanze hinzufügen";
   modalPlant.classList.add("show");
 }
@@ -293,15 +296,15 @@ function openEditPlantModal(id) {
   fPlantName.value = plant.name;
   fPlantSpecies.value = plant.species || "";
   fPlantSun.value = plant.sunHours;
-  
+
   // Format ISO to local datetime string for input field
   const date = new Date(plant.lastWatered);
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   fPlantLastWatered.value = date.toISOString().slice(0, 16);
-  
+
   fPlantImage.value = plant.imageUrl || "";
   fPlantDesc.value = plant.description || "";
-  
+
   document.getElementById("modal-plant-title").textContent = "Pflanze bearbeiten";
   modalPlant.classList.add("show");
 }
@@ -335,7 +338,7 @@ window.addEventListener("click", (e) => {
 // Submit: Plant Form
 formPlant.addEventListener("submit", (e) => {
   e.preventDefault();
-  
+
   const id = fPlantId.value;
   const name = fPlantName.value.trim();
   const species = fPlantSpecies.value.trim();
@@ -384,7 +387,7 @@ formPlant.addEventListener("submit", (e) => {
 // Submit: Balcony Form
 formBalcony.addEventListener("submit", (e) => {
   e.preventDefault();
-  
+
   state.balcony.city = fBalconyCity.value.trim();
   state.balcony.zipCode = fBalconyZip.value.trim();
   state.balcony.defaultSunHours = parseFloat(fBalconySun.value);
@@ -426,7 +429,7 @@ async function triggerAIAnalysis() {
 
   try {
     elLoadingText.textContent = "KI Agenten bewerten Bodenfeuchtigkeit & Wasserbedarf...";
-    
+
     const response = await fetch(`${apiBase}/api/analyze`, {
       method: "POST",
       headers: {
@@ -441,7 +444,7 @@ async function triggerAIAnalysis() {
     }
 
     const data = await response.json();
-    
+
     if (data.success && data.analyses) {
       // Merge results back into plants state
       data.analyses.forEach(result => {
@@ -451,9 +454,10 @@ async function triggerAIAnalysis() {
           state.plants[plantIndex].status = result.status;
           state.plants[plantIndex].next_watering_date = result.next_watering_date;
           state.plants[plantIndex].explanation = result.explanation;
+          state.plants[plantIndex].watering_tips = result.watering_tips;
         }
       });
-      
+
       saveState();
       renderPlants();
     } else {

@@ -279,7 +279,8 @@ async def analyze_plant(
       "moisture_level": {moisture_level},
       "status": "{status}",
       "next_watering_date": "{next_watering_date}",
-      "explanation": "<your 1-2 sentence English explanation>"
+      "explanation": "<your 1-2 sentence English explanation>",
+      "watering_tips": "<a concise, actionable qualitative watering or care tip in German for this plant, e.g. 'Gieße am besten von unten, da die Erde stark ausgetrocknet ist...' or 'Vermeide Wasser auf den Blättern bei starker Mittagssonne...'>"
     }}
     """
     
@@ -332,7 +333,8 @@ async def analyze_plant(
             "species": species,
             "status": result_data.get("status", "Unknown"),
             "moisture_level": result_data.get("moisture_level", 0),
-            "explanation": result_data.get("explanation", "")
+            "explanation": result_data.get("explanation", ""),
+            "watering_tips": result_data.get("watering_tips", "")
         }
         SESSIONS_DB.append(session_info)
         

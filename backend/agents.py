@@ -21,6 +21,7 @@ class SinglePlantAnalysis(BaseModel):
     status: str = Field(..., description="Must be one of: 'Water Now' (very dry), 'Water Soon' (moderately dry), or 'Healthy' (well watered)")
     next_watering_date: str = Field(..., description="Estimated ISO date string (YYYY-MM-DD) for when the plant will next require watering")
     explanation: str = Field(..., description="A concise 1-2 sentence explanation in German of why this decision was made, citing weather and sun exposure.")
+    watering_tips: str = Field(..., description="Ein prägnanter, handlungsorientierter qualitativer Gieß- oder Pflegetipp auf Deutsch für diese Pflanze, passend zur aktuellen Feuchtigkeit und Pflanzenart.")
 
 class BatchAnalysisResponse(BaseModel):
     analyses: List[SinglePlantAnalysis]
@@ -213,6 +214,7 @@ Your task is to write a concise 1-2 sentence German explanation summarizing the 
 1. The estimated moisture level.
 2. The weather parameters (recent temperatures, relative humidity, or rain if applicable).
 3. The impact of the plant's sun hours setting (especially if it deviates from the optimal sun hours for its category) and whether the balcony coverage protected it from rain.
+4. Ein handlungsorientierter qualitativer Gieß- oder Pflegetipp auf Deutsch (watering_tips) passend zur aktuellen Feuchtigkeit und Pflanzenart (z. B. 'Gieße am besten von unten...' oder 'Vermeide Wasser auf den Blättern...').
 
 Return the final results matching the BatchAnalysisResponse schema.
 """

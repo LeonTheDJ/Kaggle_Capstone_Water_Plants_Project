@@ -479,7 +479,7 @@ body {
   color: var(--text-secondary);
   margin-bottom: 0.5rem;
   min-height: 40px;
-  max-height: 52px;
+  max-height: 130px;
   overflow-y: auto;
   line-height: 1.2;
 }
