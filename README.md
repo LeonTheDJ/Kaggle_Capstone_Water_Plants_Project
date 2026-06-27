@@ -58,6 +58,9 @@ For local development using the standard Gemini backend, create a `.env` file in
 GEMINI_API_KEY="your_gemini_api_key_here"
 ```
 
+> [!IMPORTANT]
+> Make sure that `.env` is listed in your `.gitignore` file. You must **never** commit the `.env` file or any real API keys to version control!
+
 ### 1.1 Coupling with Your Own Google Cloud Project
 
 To connect this application to your own Google Cloud infrastructure and Vertex AI reasoning engine, you do **not** need to add GCP variables to your local `.env`. Instead, configure them using one of the following methods:
