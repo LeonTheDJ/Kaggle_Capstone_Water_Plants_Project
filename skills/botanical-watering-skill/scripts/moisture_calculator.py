@@ -19,6 +19,28 @@ def load_plant_database():
 def get_category_data(species_name, db):
     """Finds the matching category in the plant database."""
     categories = db.get("categories", [])
+    
+    # Map English UI species names to German database IDs
+    mapping = {
+        "water-loving herbs": "kraeuter_wasserliebend",
+        "mediterranean herbs": "kraeuter_mediterran",
+        "succulents & cacti": "sukkulenten_kakteen",
+        "thirsty flowers": "bluehpflanzen_durstig",
+        "normal flowers": "bluehpflanzen_normal",
+        "thirsty vegetables": "gemuese_durstig",
+        "normal vegetables": "gemuese_normal",
+        "fruits & berries": "obst_beeren",
+        "mediterranean container plants": "kuebelpflanzen_mediterran",
+        "climbing plants & ivy": "kletterpflanzen_efeu",
+        "shade plants": "gruenpflanzen_schattig"
+    }
+    
+    mapped_id = mapping.get(species_name.lower())
+    if mapped_id:
+        for cat in categories:
+            if cat["id"] == mapped_id:
+                return cat
+
     # Find exact match
     for cat in categories:
         if cat["name"].lower() == species_name.lower():
@@ -87,8 +109,8 @@ def calculate_plant_moisture(plant: dict, balcony_config: dict, weather_data: di
             h_mean = humidities[idx] if idx < len(humidities) and humidities[idx] is not None else 60.0
             rain_mm = rains[idx] if idx < len(rains) and rains[idx] is not None else 0.0
             
-        # 1. Temperature Factor (F_temp = Temp / 20.0, minimum 0.2)
-        f_temp = max(0.2, t_mean / 20.0)
+        # 1. Temperature Factor (F_temp = (Temp / 20.0) ** 3.5, minimum 0.2)
+        f_temp = max(0.2, (t_mean / 20.0) ** 3.5)
         
         # 2. Sun Exposure Factor (F_sun = 1.0 + 0.15 * (S_plant - S_optimal), minimum 0.2)
         f_sun = max(0.2, 1.0 + 0.15 * (plant_sun - optimal_sun))
@@ -109,10 +131,10 @@ def calculate_plant_moisture(plant: dict, balcony_config: dict, weather_data: di
 
     # Categorize watering status
     moisture_val = int(round(current_moisture))
-    if moisture_val < 25:
+    if moisture_val < 35:
         status = "Water Now"
         next_water_date = now.strftime("%Y-%m-%d")
-    elif moisture_val < 50:
+    elif moisture_val < 60:
         status = "Water Soon"
         next_water_date = (now + timedelta(days=1)).strftime("%Y-%m-%d")
     else:
@@ -121,7 +143,7 @@ def calculate_plant_moisture(plant: dict, balcony_config: dict, weather_data: di
         # Estimate next watering date by projecting forward using average depletion
         # Use average daily depletion simulated or default base depletion adjusted
         avg_depletion = max(1.0, (100.0 - current_moisture) / days_since) if days_since > 0 else (base_depletion * 1.0)
-        days_remaining = max(1, int(round((current_moisture - 30.0) / avg_depletion)))
+        days_remaining = max(1, int(round((current_moisture - 55.0) / avg_depletion)))
         next_water_date = (now + timedelta(days=days_remaining)).strftime("%Y-%m-%d")
         
     return {
