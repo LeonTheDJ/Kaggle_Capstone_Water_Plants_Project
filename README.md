@@ -92,6 +92,18 @@ To connect this application to your own Google Cloud infrastructure and Vertex A
 
 ### 2. Running the Frontend & Backends Locally
 
+> [!IMPORTANT]
+> **Compiling Frontend Changes for Local & Google Cloud Deployments:**
+> Whenever you modify any frontend code (HTML, CSS, JS) inside the `frontend/` directory, you **must compile the assets** so they are distributed to the backends. The build process automatically bundles the assets and copies them to:
+> - **`backend/static/`** (for local development / Docker executions)
+> - **`submission_frontend/static/`** (for Cloud Run / Google Cloud deployment)
+>
+> Run the compilation command:
+> ```powershell
+> cd frontend
+> npm run build
+> ```
+
 #### Option A: Running with Vite Development Server (Queries Local Backend)
 1. **Start the local backend server (Port 8000):**
    ```powershell
