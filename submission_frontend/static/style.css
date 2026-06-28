@@ -40,7 +40,7 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  padding: 2rem 1.5rem;
+  padding: 0.75rem 1.5rem 2rem 1.5rem;
 }
 
 /* Background Blobs */
@@ -78,19 +78,23 @@ body {
 
 /* Header */
 .app-header {
-  text-align: center;
-  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 1.25rem;
 }
 .logo {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 .logo h1 {
   font-family: var(--font-display);
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: #ffffff;
@@ -99,14 +103,16 @@ body {
   color: #ffffff;
 }
 .header-logo {
-  height: 2.8rem;
+  height: 2.4rem;
   width: auto;
 }
 .subtitle {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.95rem;
   max-width: 600px;
-  margin: 0 auto;
+  margin: 0;
+  border-left: 1px solid var(--border-glass);
+  padding-left: 1.25rem;
 }
 
 /* Layout */
@@ -134,8 +140,13 @@ body {
 .balcony-widget, .weather-widget, .thirsty-widget {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 200px;
+  justify-content: flex-start;
+  min-height: 110px;
+  position: relative;
+  gap: 0.5rem;
+}
+.top-row .glass {
+  padding: 0.75rem 1rem;
 }
 
 section h3 {
@@ -151,10 +162,10 @@ section h3 {
 
 /* Balcony Widget Info */
 .balcony-info-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.65rem;
-  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
 }
 .balcony-info-grid .label {
   font-size: 0.75rem;
@@ -162,53 +173,57 @@ section h3 {
 }
 .balcony-info-grid .val {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #ffffff;
-  float: right;
+  float: none;
 }
 .balcony-btn-row {
-  display: flex;
-  justify-content: flex-end;
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
 }
 
 /* Weather Widget Info */
 .weather-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
 .weather-metric {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-glass);
   border-radius: 6px;
-  padding: 0.5rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
 }
 .weather-metric .lbl {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
 }
 .weather-metric .val {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #ffffff;
 }
 .weather-coordinates {
-  font-size: 0.7rem;
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  font-size: 0.65rem;
   color: var(--text-muted);
-  text-align: right;
-  margin-top: 0.25rem;
 }
 
 /* Thirsty Widget Info */
 .thirsty-content {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  max-height: 140px;
+  gap: 0.35rem;
+  max-height: 70px;
+  overflow-y: auto;
 }
 .thirsty-item {
   display: flex;
@@ -216,9 +231,9 @@ section h3 {
   align-items: center;
   background: rgba(239, 68, 68, 0.08);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.85rem;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
   animation: fadeIn 0.4s ease-out;
 }
 .thirsty-name {
@@ -236,8 +251,8 @@ section h3 {
 .empty-thirsty {
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.85rem;
-  padding: 1.5rem 0;
+  font-size: 0.75rem;
+  padding: 0.5rem 0;
   border: 1px dashed rgba(255, 255, 255, 0.04);
   border-radius: 8px;
 }
