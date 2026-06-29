@@ -29,6 +29,9 @@ htmlcov/
 PS_Deploy_Command.txt
 PS_Deploy_Command.md
 
+# Project Writeups
+Writeup_files/
+
 # IDE and System files
 .vscode/
 .idea/
