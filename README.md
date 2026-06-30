@@ -185,8 +185,8 @@ We performed a systematic **STRIDE Threat Modeling Assessment** (detailed in [th
 
 ### Implemented Security Features
 
-1. **Opt-In API Key Authentication (Spoofing & Privilege Elevation):**
-   Secure your API endpoints with an optional API key (`FLORAWAVE_API_KEY` in environment variables). If configured, the backend verifies the `X-API-Key` header (or `api_key` query parameter for GET requests). The frontend settings modal includes an optional password input to save and send this key.
+1. **Opt-In AI Feature Password Authentication (Spoofing & Privilege Elevation):**
+   Secure your API endpoints with an optional app password (`FLORAWAVE_API_KEY` in environment variables). If configured, the backend verifies the `X-API-Key` header (or `api_key` query parameter for GET requests). The frontend settings modal includes an optional password input (masked with dots) to save this password. If a request is rejected with 403 Forbidden, the frontend alerts the user (*"Please enter the correct AI Feature Password to use this service."*), opens the settings modal, and focuses on the password field to require it.
 2. **In-Memory Weather & Geocoding Caching (Denial of Service):**
    Both backends cache Open-Meteo geocoding and forecast queries using a lightweight `WeatherCache` (3 hours TTL), reducing external network latency and saving up to 95% of third-party API quotas.
 3. **SQLite Audit Trail Logging (Repudiation):**
