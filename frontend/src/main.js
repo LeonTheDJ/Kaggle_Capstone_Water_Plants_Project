@@ -238,10 +238,10 @@ function openEditPlantModal(id) {
 }
 
 // Fetch Weather details
-async function updateWeather() {
+async function updateWeather(isFormSubmit = false) {
   try {
     const query = state.balcony.country ? `${state.balcony.city}, ${state.balcony.country}` : state.balcony.city;
-    const data = await fetchWeatherInfo(query);
+    const data = await fetchWeatherInfo(query, isFormSubmit);
 
     weatherWidget.innerHTML = `
       <h3><i class="fa-solid fa-cloud-sun"></i> Current Weather in ${data.city}</h3>
@@ -270,11 +270,20 @@ async function updateWeather() {
 }
 
 // Fetch weather info dynamically (proxy vs direct Open-Meteo depending on backend mode)
-async function fetchWeatherInfo(city) {
+async function fetchWeatherInfo(city, isFormSubmit = false) {
   if (!isLocalBackend) {
     // Cloud Run Mode (FastAPI proxy)
     const apiKeyParam = state.balcony.apiKey ? `?api_key=${encodeURIComponent(state.balcony.apiKey)}` : "";
     const res = await fetch(`${apiBase}/api/weather/${encodeURIComponent(city)}${apiKeyParam}`);
+    if (res.status === 403) {
+      if (isFormSubmit) {
+        alert("Please enter the correct AI Feature Password to use this service.");
+        btnEditBalcony.click();
+        const apiField = document.getElementById("field-balcony-api-key");
+        if (apiField) apiField.focus();
+      }
+      throw new Error("AI Feature Password is required.");
+    }
     if (!res.ok) throw new Error("Weather fetch failed");
     return await res.json();
   } else {
@@ -368,11 +377,11 @@ async function analyzeSinglePlant(id) {
 
       const res = await fetch(url);
       if (res.status === 403) {
-        alert("This server requires a valid AI Feature Password. Opening settings modal so you can configure it...");
+        alert("Please enter the correct AI Feature Password to use this service.");
         btnEditBalcony.click();
         const apiField = document.getElementById("field-balcony-api-key");
         if (apiField) apiField.focus();
-        throw new Error("AI Feature Password is required.");
+        return false;
       }
       if (!res.ok) {
         const errBody = await res.json();
@@ -394,11 +403,11 @@ async function analyzeSinglePlant(id) {
       saveState();
       renderPlants();
       updateThirstyPlants();
-      break; // Success
+      return true; // Success
 
     } catch (err) {
       alert(`Analysis failed for ${plant.name}: ${err.message}`);
-      break;
+      return false;
     } finally {
       loadingOverlay.classList.remove("show");
     }
@@ -446,11 +455,11 @@ async function analyzeAllPlantsBatch() {
       });
 
       if (response.status === 403) {
-        alert("This server requires a valid AI Feature Password. Opening settings modal so you can configure it...");
+        alert("Please enter the correct AI Feature Password to use this service.");
         btnEditBalcony.click();
         const apiField = document.getElementById("field-balcony-api-key");
         if (apiField) apiField.focus();
-        throw new Error("AI Feature Password is required.");
+        return; // Return to prevent double alert from catch block
       }
       if (!response.ok) {
         const errData = await response.json();
@@ -504,7 +513,8 @@ btnAnalyzeAll.addEventListener("click", async () => {
   } else {
     // Gcloud sequential individual analyses
     for (const plant of state.plants) {
-      await analyzeSinglePlant(plant.id);
+      const ok = await analyzeSinglePlant(plant.id);
+      if (!ok) break; // Stop loop if any plant fails (e.g. on auth error)
     }
   }
 });
@@ -684,7 +694,7 @@ formBalcony.addEventListener("submit", (e) => {
 
   saveState();
   renderBalcony();
-  updateWeather();
+  updateWeather(true);
   closeModal();
 });
 
