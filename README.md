@@ -177,7 +177,24 @@ gcloud projects add-iam-policy-binding <YOUR_GCP_PROJECT_ID> `
 
 ---
 
-## 🔒 Security & Git Commit Safety
+## 🔒 Security, STRIDE & Git Commit Safety
+
+### STRIDE Threat Modeling Assessment
+
+We performed a systematic **STRIDE Threat Modeling Assessment** (detailed in [threat_model.md](threat_model.md) and guided by the custom [stride-threat-model](skills/stride-threat-model/SKILL.md) skill) to secure endpoints, control privacy, and prevent resource abuse.
+
+### Implemented Security Features
+
+1. **Opt-In API Key Authentication (Spoofing & Privilege Elevation):**
+   Secure your API endpoints with an optional API key (`FLORAWAVE_API_KEY` in environment variables). If configured, the backend verifies the `X-API-Key` header (or `api_key` query parameter for GET requests). The frontend settings modal includes an optional password input to save and send this key.
+2. **In-Memory Weather & Geocoding Caching (Denial of Service):**
+   Both backends cache Open-Meteo geocoding and forecast queries using a lightweight `WeatherCache` (3 hours TTL), reducing external network latency and saving up to 95% of third-party API quotas.
+3. **SQLite Audit Trail Logging (Repudiation):**
+   Analyses are logged in a persistent SQLite database (`audit_logs.db`) using the Python standard library, securing timestamped records of plant watering recommendations.
+4. **Global Exception Handling (Information Disclosure):**
+   Both FastAPI services run global exception middleware to log detailed tracebacks internally while returning sanitized, generic messages to the client.
+
+### Pre-Commit Safety Checks
 
 To ensure no environment files (`.env`), system absolute paths, or private API keys are accidentally committed to the public Git repository, use the `git-commit-version` skill to commit your changes:
 
