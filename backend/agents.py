@@ -36,10 +36,40 @@ def get_gemini_client():
         logger.warning("GEMINI_API_KEY environment variable is not set. The analysis will fail.")
     return genai.Client()
 
+import time
+
+class WeatherCache:
+    def __init__(self, ttl_seconds=10800):  # 3 hours
+        self.cache = {}
+        self.ttl = ttl_seconds
+        
+    def get(self, key):
+        if key in self.cache:
+            entry = self.cache[key]
+            if time.time() - entry["timestamp"] < self.ttl:
+                return entry["data"]
+            else:
+                del self.cache[key]
+        return None
+        
+    def set(self, key, data):
+        self.cache[key] = {
+            "timestamp": time.time(),
+            "data": data
+        }
+
+WEATHER_CACHE = WeatherCache()
+
 async def run_mcp_geocoding(city: str, zip_code: str) -> Dict[str, Any]:
     """
     Connects to the local Weather MCP server to resolve coordinates for a location.
     """
+    cache_key = f"mcp_geocode_{city.lower()}_{zip_code.lower()}"
+    cached = WEATHER_CACHE.get(cache_key)
+    if cached:
+        logger.info(f"Geocoding cache hit for {city}, {zip_code}")
+        return cached
+
     server_params = StdioServerParameters(
         command="python",
         args=["mcp_server/weather_mcp.py"]
@@ -62,6 +92,8 @@ async def run_mcp_geocoding(city: str, zip_code: str) -> Dict[str, Any]:
                 
                 # Parse output (which is JSON text representation)
                 result = json.loads(response.content[0].text)
+                if isinstance(result, dict) and "error" not in result:
+                    WEATHER_CACHE.set(cache_key, result)
                 return result
     except Exception as e:
         logger.error(f"Error calling geocode MCP tool: {str(e)}")
@@ -71,6 +103,12 @@ async def run_mcp_weather(latitude: float, longitude: float, past_days: int) -> 
     """
     Connects to the local Weather MCP server to fetch historical weather data.
     """
+    cache_key = f"mcp_weather_{latitude}_{longitude}_{past_days}"
+    cached = WEATHER_CACHE.get(cache_key)
+    if cached:
+        logger.info(f"Weather cache hit for {latitude}, {longitude}, past_days={past_days}")
+        return cached
+
     server_params = StdioServerParameters(
         command="python",
         args=["mcp_server/weather_mcp.py"]
@@ -91,6 +129,8 @@ async def run_mcp_weather(latitude: float, longitude: float, past_days: int) -> 
                     return {"error": "Weather tool returned empty response"}
                 
                 result = json.loads(response.content[0].text)
+                if isinstance(result, dict) and "error" not in result:
+                    WEATHER_CACHE.set(cache_key, result)
                 return result
     except Exception as e:
         logger.error(f"Error calling weather MCP tool: {str(e)}")

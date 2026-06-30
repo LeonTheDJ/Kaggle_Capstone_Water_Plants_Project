@@ -3,8 +3,11 @@ import sys
 import datetime
 import json
 import logging
+import sqlite3
+import time
 from typing import Optional, List, Dict, Any
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import httpx
@@ -53,6 +56,85 @@ AGENT_RUNTIME_ID = os.environ.get("AGENT_RUNTIME_ID", "projects/882498418292/loc
 # In-memory session tracking
 SESSIONS_DB = []
 
+class WeatherCache:
+    def __init__(self, ttl_seconds=10800):  # 3 hours
+        self.cache = {}
+        self.ttl = ttl_seconds
+        
+    def get(self, key):
+        if key in self.cache:
+            entry = self.cache[key]
+            if time.time() - entry["timestamp"] < self.ttl:
+                return entry["data"]
+            else:
+                del self.cache[key]
+        return None
+        
+    def set(self, key, data):
+        self.cache[key] = {
+            "timestamp": time.time(),
+            "data": data
+        }
+
+WEATHER_CACHE = WeatherCache()
+
+# Initialize SQLite audit DB
+def init_audit_db():
+    try:
+        conn = sqlite3.connect("audit_logs.db")
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS audit_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
+                plant_name TEXT,
+                species TEXT,
+                status TEXT,
+                moisture_level INTEGER,
+                watered_by_rain BOOLEAN
+            )
+        """)
+        conn.commit()
+        conn.close()
+        logger.info("SQLite audit DB initialized successfully in submission_frontend.")
+    except Exception as e:
+        logger.error(f"Failed to initialize SQLite audit DB in submission_frontend: {e}")
+
+init_audit_db()
+
+def log_analysis(plant_name: str, species: str, status: str, moisture_level: int, watered_by_rain: bool):
+    try:
+        conn = sqlite3.connect("audit_logs.db")
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO audit_logs (plant_name, species, status, moisture_level, watered_by_rain)
+            VALUES (?, ?, ?, ?, ?)
+        """, (plant_name, species, status, moisture_level, watered_by_rain))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logger.error(f"Failed to log analysis to audit DB: {e}")
+
+# Optional API Key Authentication
+API_KEY = os.getenv("FLORAWAVE_API_KEY")
+
+def verify_api_key(request: Request):
+    if API_KEY:
+        header_key = request.headers.get("X-API-Key")
+        if not header_key:
+            header_key = request.query_params.get("api_key")
+        if header_key != API_KEY:
+            raise HTTPException(status_code=403, detail="Invalid or missing API key.")
+
+# Global Exception Handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Global unhandled exception on {request.url.path}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal server error occurred. Please contact the administrator."}
+    )
+
 try:
     logger.info(f"Initializing Vertex AI with project={PROJECT_ID}, location={LOCATION}")
     vertexai.init(project=PROJECT_ID, location=LOCATION)
@@ -67,8 +149,16 @@ GEO_API_URL = "https://geocoding-api.open-meteo.com/v1/search"
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
 
 @app.get("/api/weather/{city}")
-async def get_weather(city: str):
+async def get_weather(city: str, request: Request):
     """Fetch current weather for a city with dual-unit formatting."""
+    verify_api_key(request)
+    
+    cache_key = f"current_weather_{city.lower()}"
+    cached = WEATHER_CACHE.get(cache_key)
+    if cached:
+        logger.info(f"Weather cache hit for {city}")
+        return cached
+
     try:
         async with httpx.AsyncClient() as client:
             # 1. Geocode location
@@ -107,7 +197,7 @@ async def get_weather(city: str):
             
             humidity = current["relative_humidity_2m"]
             
-            return {
+            res_dict = {
                 "city": display_name,
                 "latitude": lat,
                 "longitude": lon,
@@ -117,6 +207,8 @@ async def get_weather(city: str):
                 "precipitation_mm": round(precip_mm, 2),
                 "precipitation_in": round(precip_in, 2)
             }
+            WEATHER_CACHE.set(cache_key, res_dict)
+            return res_dict
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Weather retrieval failed: {str(e)}")
 
@@ -129,26 +221,36 @@ async def analyze_plant(
     last_watered: str,
     sun_hours: float,
     is_covered: bool,
+    request: Request,
     rain_exposure: bool = False
 ):
     """Sends plant data to the deployed Agent Runtime and parses the recommendation."""
+    verify_api_key(request)
+
     if not agent_engine:
         raise HTTPException(status_code=500, detail="Vertex AI Agent Engine is not initialized.")
         
     # 1. Geocode location to get latitude and longitude
     lat, lon = 48.13743, 11.57549  # Default to Munich
-    try:
-        geocode_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city},{country}&count=1&format=json"
-        async with httpx.AsyncClient() as client:
-            geo_res = await client.get(geocode_url)
-            geo_res.raise_for_status()
-            geo_data = geo_res.json()
-            if "results" in geo_data and len(geo_data["results"]) > 0:
-                result = geo_data["results"][0]
-                lat = result["latitude"]
-                lon = result["longitude"]
-    except Exception as e:
-        logger.error(f"Geocoding failed, using fallback coordinates. Error: {e}")
+    geo_cache_key = f"geocode_{city.lower()}_{country.lower()}"
+    cached_geo = WEATHER_CACHE.get(geo_cache_key)
+    if cached_geo:
+        lat, lon = cached_geo
+        logger.info(f"Geocoding cache hit for {city}, {country}: {lat}, {lon}")
+    else:
+        try:
+            geocode_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city},{country}&count=1&format=json"
+            async with httpx.AsyncClient() as client:
+                geo_res = await client.get(geocode_url)
+                geo_res.raise_for_status()
+                geo_data = geo_res.json()
+                if "results" in geo_data and len(geo_data["results"]) > 0:
+                    result = geo_data["results"][0]
+                    lat = result["latitude"]
+                    lon = result["longitude"]
+                    WEATHER_CACHE.set(geo_cache_key, (lat, lon))
+        except Exception as e:
+            logger.error(f"Geocoding failed, using fallback coordinates. Error: {e}")
         
     # 2. Calculate days since last watered
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -169,61 +271,68 @@ async def analyze_plant(
         "precipitation_sum_mm": []
     }
     
-    try:
-        weather_url = (
-            f"https://api.open-meteo.com/v1/forecast"
-            f"?latitude={lat}&longitude={lon}"
-            f"&hourly=temperature_2m,relative_humidity_2m,precipitation"
-            f"&timezone=auto&past_days={days_since}&forecast_days=1"
-        )
-        async with httpx.AsyncClient() as client:
-            res = await client.get(weather_url)
-            res.raise_for_status()
-            res_json = res.json()
-            
-            if "hourly" in res_json:
-                hourly = res_json["hourly"]
-                times = hourly.get("time", [])
-                temps = hourly.get("temperature_2m", [])
-                humidities = hourly.get("relative_humidity_2m", [])
-                precips = hourly.get("precipitation", [])
+    weather_cache_key = f"history_weather_{lat}_{lon}_{days_since}"
+    cached_weather = WEATHER_CACHE.get(weather_cache_key)
+    if cached_weather:
+        weather_data = cached_weather
+        logger.info(f"Historical weather cache hit for {lat}, {lon}, past_days={days_since}")
+    else:
+        try:
+            weather_url = (
+                f"https://api.open-meteo.com/v1/forecast"
+                f"?latitude={lat}&longitude={lon}"
+                f"&hourly=temperature_2m,relative_humidity_2m,precipitation"
+                f"&timezone=auto&past_days={days_since}&forecast_days=1"
+            )
+            async with httpx.AsyncClient() as client:
+                res = await client.get(weather_url)
+                res.raise_for_status()
+                res_json = res.json()
                 
-                # Group hourly data by date (YYYY-MM-DD)
-                daily_groups = {}
-                for idx, t_str in enumerate(times):
-                    date_key = t_str.split("T")[0]
-                    if date_key not in daily_groups:
-                        daily_groups[date_key] = {"temps": [], "humidities": [], "precips": []}
+                if "hourly" in res_json:
+                    hourly = res_json["hourly"]
+                    times = hourly.get("time", [])
+                    temps = hourly.get("temperature_2m", [])
+                    humidities = hourly.get("relative_humidity_2m", [])
+                    precips = hourly.get("precipitation", [])
                     
-                    if idx < len(temps) and temps[idx] is not None:
-                        daily_groups[date_key]["temps"].append(temps[idx])
-                    if idx < len(humidities) and humidities[idx] is not None:
-                        daily_groups[date_key]["humidities"].append(humidities[idx])
-                    if idx < len(precips) and precips[idx] is not None:
-                        daily_groups[date_key]["precips"].append(precips[idx])
-                
-                sorted_dates = sorted(daily_groups.keys())
-                for date in sorted_dates:
-                    group = daily_groups[date]
-                    avg_temp = sum(group["temps"]) / len(group["temps"]) if group["temps"] else 20.0
-                    avg_hum = sum(group["humidities"]) / len(group["humidities"]) if group["humidities"] else 60.0
-                    sum_prec = sum(group["precips"]) if group["precips"] else 0.0
+                    # Group hourly data by date (YYYY-MM-DD)
+                    daily_groups = {}
+                    for idx, t_str in enumerate(times):
+                        date_key = t_str.split("T")[0]
+                        if date_key not in daily_groups:
+                            daily_groups[date_key] = {"temps": [], "humidities": [], "precips": []}
+                        
+                        if idx < len(temps) and temps[idx] is not None:
+                            daily_groups[date_key]["temps"].append(temps[idx])
+                        if idx < len(humidities) and humidities[idx] is not None:
+                            daily_groups[date_key]["humidities"].append(humidities[idx])
+                        if idx < len(precips) and precips[idx] is not None:
+                            daily_groups[date_key]["precips"].append(precips[idx])
                     
-                    weather_data["time"].append(date)
-                    weather_data["temperature_mean_c"].append(round(avg_temp, 2))
-                    weather_data["humidity_mean_percent"].append(round(avg_hum, 2))
-                    weather_data["precipitation_sum_mm"].append(round(sum_prec, 2))
-                
-                logger.info(f"Processed daily weather data: {len(weather_data['time'])} days.")
-    except Exception as e:
-        logger.error(f"Error fetching/processing historical weather hourly: {e}")
-        # Build fallback mock weather arrays
-        dates = [(now - datetime.timedelta(days=d)).strftime("%Y-%m-%d") for d in range(days_since + 1)]
-        dates.reverse()
-        weather_data["time"] = dates
-        weather_data["temperature_mean_c"] = [20.0] * len(dates)
-        weather_data["humidity_mean_percent"] = [60.0] * len(dates)
-        weather_data["precipitation_sum_mm"] = [0.0] * len(dates)
+                    sorted_dates = sorted(daily_groups.keys())
+                    for date in sorted_dates:
+                        group = daily_groups[date]
+                        avg_temp = sum(group["temps"]) / len(group["temps"]) if group["temps"] else 20.0
+                        avg_hum = sum(group["humidities"]) / len(group["humidities"]) if group["humidities"] else 60.0
+                        sum_prec = sum(group["precips"]) if group["precips"] else 0.0
+                        
+                        weather_data["time"].append(date)
+                        weather_data["temperature_mean_c"].append(round(avg_temp, 2))
+                        weather_data["humidity_mean_percent"].append(round(avg_hum, 2))
+                        weather_data["precipitation_sum_mm"].append(round(sum_prec, 2))
+                    
+                    logger.info(f"Processed daily weather data: {len(weather_data['time'])} days.")
+                    WEATHER_CACHE.set(weather_cache_key, weather_data)
+        except Exception as e:
+            logger.error(f"Error fetching/processing historical weather hourly: {e}")
+            # Build fallback mock weather arrays
+            dates = [(now - datetime.timedelta(days=d)).strftime("%Y-%m-%d") for d in range(days_since + 1)]
+            dates.reverse()
+            weather_data["time"] = dates
+            weather_data["temperature_mean_c"] = [20.0] * len(dates)
+            weather_data["humidity_mean_percent"] = [60.0] * len(dates)
+            weather_data["precipitation_sum_mm"] = [0.0] * len(dates)
         
     # 4. Calculate plant moisture using the Skill script
     moisture_level = 50
@@ -357,6 +466,15 @@ async def analyze_plant(
             "watering_tips": result_data.get("watering_tips", "")
         }
         SESSIONS_DB.append(session_info)
+        
+        # Log to SQLite audit DB
+        log_analysis(
+            plant_name=plant_name,
+            species=species,
+            status=result_data.get("status", "Unknown"),
+            moisture_level=result_data.get("moisture_level", 0),
+            watered_by_rain=result_data.get("watered_by_rain", False)
+        )
         
         return {
             "session_id": sess_uuid,

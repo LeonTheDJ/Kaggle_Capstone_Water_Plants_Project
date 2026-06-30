@@ -273,7 +273,8 @@ async function updateWeather() {
 async function fetchWeatherInfo(city) {
   if (!isLocalBackend) {
     // Cloud Run Mode (FastAPI proxy)
-    const res = await fetch(`${apiBase}/api/weather/${encodeURIComponent(city)}`);
+    const apiKeyParam = state.balcony.apiKey ? `?api_key=${encodeURIComponent(state.balcony.apiKey)}` : "";
+    const res = await fetch(`${apiBase}/api/weather/${encodeURIComponent(city)}${apiKeyParam}`);
     if (!res.ok) throw new Error("Weather fetch failed");
     return await res.json();
   } else {
@@ -359,6 +360,9 @@ async function analyzeSinglePlant(id) {
     url.searchParams.append("sun_hours", plant.sunHours);
     url.searchParams.append("is_covered", state.balcony.isCovered);
     url.searchParams.append("rain_exposure", plant.rainExposure || false);
+    if (state.balcony.apiKey) {
+      url.searchParams.append("api_key", state.balcony.apiKey);
+    }
 
     const res = await fetch(url);
     if (!res.ok) {
@@ -414,11 +418,16 @@ async function analyzeAllPlantsBatch() {
   };
 
   try {
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    if (state.balcony.apiKey) {
+      headers["X-API-Key"] = state.balcony.apiKey;
+    }
+
     const response = await fetch(`${apiBase}/api/analyze`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: headers,
       body: JSON.stringify(requestBody)
     });
 
@@ -501,6 +510,7 @@ btnEditBalcony.addEventListener("click", () => {
   document.getElementById("field-balcony-zip").value = state.balcony.zipCode;
   document.getElementById("field-balcony-sun").value = state.balcony.defaultSunHours;
   document.getElementById("field-balcony-covered").checked = state.balcony.isCovered;
+  document.getElementById("field-balcony-api-key").value = state.balcony.apiKey || "";
   modalBalcony.classList.add("show");
 });
 
@@ -646,6 +656,7 @@ formBalcony.addEventListener("submit", (e) => {
   state.balcony.zipCode = document.getElementById("field-balcony-zip").value.trim();
   state.balcony.defaultSunHours = parseFloat(document.getElementById("field-balcony-sun").value);
   state.balcony.isCovered = document.getElementById("field-balcony-covered").checked;
+  state.balcony.apiKey = document.getElementById("field-balcony-api-key").value.trim();
 
   saveState();
   renderBalcony();

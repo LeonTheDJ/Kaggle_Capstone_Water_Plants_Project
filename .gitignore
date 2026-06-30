@@ -37,3 +37,6 @@ Writeup_files/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Databases
+*.db
