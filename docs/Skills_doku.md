@@ -10,7 +10,7 @@ In diesem Dokument werden alle im Projekt definierten Skills sowie die globalen 
 *   **Bodenfeuchtigkeitsmodell:** Berechnet den täglichen Feuchtigkeitsverlust unter Berücksichtigung von Umgebungstemperatur, Abweichungen der Sonnenstunden vom Optimum, relativer Luftfeuchtigkeit und Regen (falls der Balkon nicht überdacht ist).
 *   **Status-Kategorisierung:** Teilt den Zustand in *Healthy* ($\ge 50\%$), *Water Soon* ($25\% - 49\%$) und *Water Now* ($< 25\%$) ein und berechnet darauf basierend den nächsten Gießzeitpunkt.
 *   **Englische Begründungstexte:** Erstellt prägnante Erklärungen (1–2 Sätze) in englischer Sprache, welche die Berechnungsgründe verständlich zusammenfassen (Zitierung der Feuchtigkeit, Wetterdaten, Abweichung der Sonnenstunden und Regeneinfluss).
-*   **Berechnungsskript:** Verweist auf das ausführbare Python-Skript [moisture_calculator.py](../skills/botanical-watering-skill/scripts/moisture_calculator.py).
+*   **Berechnungsskript:** Verweist auf das ausführbare Python-Skript [evapotranspiration_calculator.py](../skills/botanical-watering-skill/scripts/evapotranspiration_calculator.py).
 
 ### [git-commit-version](../skills/git-commit-version/SKILL.md)
 *   **Commit-Namenskonvention:** Erzwingt das Format `<type>: <description>` für reguläre Commits und verlangt ein vorangestelltes Ausrufezeichen `!` für Breaking Changes bzw. spezielle Commits.

@@ -198,7 +198,7 @@ async def analyze_plants_watering(balcony_config: dict, plants: list) -> List[di
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         skill_path = os.path.join(base_dir, "skills", "botanical-watering-skill", "SKILL.md")
         db_path = os.path.join(base_dir, "skills", "botanical-watering-skill", "resources", "plant_database.json")
-        script_path = os.path.join(base_dir, "skills", "botanical-watering-skill", "scripts", "moisture_calculator.py")
+        script_path = os.path.join(base_dir, "skills", "botanical-watering-skill", "scripts", "evapotranspiration_calculator.py")
         
         if os.path.exists(skill_path):
             with open(skill_path, "r", encoding="utf-8") as f:
@@ -212,15 +212,15 @@ async def analyze_plants_watering(balcony_config: dict, plants: list) -> List[di
         else:
             logger.warning(f"Plant database not found at {db_path}")
 
-        # Dynamically load the moisture calculator script from the skill folder
+        # Dynamically load the evapotranspiration calculator script from the skill folder
         if os.path.exists(script_path):
             import importlib.util
-            spec = importlib.util.spec_from_file_location("moisture_calculator", script_path)
+            spec = importlib.util.spec_from_file_location("evapotranspiration_calculator", script_path)
             calculator_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(calculator_module)
-            logger.info("Successfully loaded moisture calculator script from skill folder.")
+            logger.info("Successfully loaded evapotranspiration calculator script from skill folder.")
         else:
-            logger.warning(f"Moisture calculator script not found at {script_path}")
+            logger.warning(f"Evapotranspiration calculator script not found at {script_path}")
     except Exception as e:
         logger.error(f"Error loading skill files: {str(e)}")
 
@@ -231,12 +231,12 @@ async def analyze_plants_watering(balcony_config: dict, plants: list) -> List[di
             calculated_results = calculator_module.calculate_plants_moisture(balcony_config, plants, weather_data)
             logger.info(f"Calculated moisture levels in Python: {calculated_results}")
         except Exception as e:
-            logger.error(f"Error running Python moisture calculator: {str(e)}")
+            logger.error(f"Error running Python evapotranspiration calculator: {str(e)}")
             calculated_results = []
 
     # 6. Construct the prompt for the Gemini Agent to generate explanations matching the calculated data
     prompt = f"""
-We have calculated the following deterministic moisture levels, statuses, and next watering dates for the user's plants using the moisture calculator script:
+We have calculated the following deterministic moisture levels, statuses, and next watering dates for the user's plants using the evapotranspiration calculator script:
 {json.dumps(calculated_results, indent=2)}
 
 ### Balcony Location:

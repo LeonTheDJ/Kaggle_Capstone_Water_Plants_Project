@@ -17,7 +17,7 @@ flowchart TD
 
     subgraph LocalBackend [FastAPI Server Boundary]
         API[API Endpoints]
-        MC[Moisture Calculator]
+        EC[Evapotranspiration Calculator]
         SD[(SESSIONS_DB In-Memory)]
     end
 
@@ -28,7 +28,7 @@ flowchart TD
 
     UI <-->|User Inputs / Settings| LS
     UI <-->|REST Requests: /api/analyze| API
-    API <-->|Python Math Model| MC
+    API <-->|Python Math Model| EC
     API <-->|Local Audit List| SD
     API <-->|GET / Geocoding & Weather| OM
     API <-->|JSON structured prompt querying| GEM

@@ -26,7 +26,7 @@ logger = logging.getLogger("submission_frontend")
 
 # Import calculate_plant_moisture locally or fallback to botanical watering skill scripts path
 try:
-    from moisture_calculator import calculate_plant_moisture
+    from evapotranspiration_calculator import calculate_plant_moisture
     logger.info("Successfully imported calculate_plant_moisture locally.")
 except ImportError:
     base_project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,7 +34,7 @@ except ImportError:
     if skill_scripts_dir not in sys.path:
         sys.path.append(skill_scripts_dir)
     try:
-        from moisture_calculator import calculate_plant_moisture
+        from evapotranspiration_calculator import calculate_plant_moisture
         logger.info("Successfully imported calculate_plant_moisture from Botanical Watering Skill.")
     except Exception as e:
         logger.error(f"Failed to import calculate_plant_moisture: {e}")

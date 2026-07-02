@@ -50,4 +50,4 @@ The agent must output a concise 1-2 sentence English explanation summarizing the
 
 ## 5. Implementation Script Reference
 
-- The mathematical model described above is implemented in the executable script located at [moisture_calculator.py](scripts/moisture_calculator.py) in the `scripts/` directory. The main backend dynamically loads and executes this script to calculate soil moisture values before requesting explanations.
+- The mathematical model described above is implemented in the executable script located at [evapotranspiration_calculator.py](scripts/evapotranspiration_calculator.py) in the `scripts/` directory. The main backend dynamically loads and executes this script to calculate soil moisture values before requesting explanations.
