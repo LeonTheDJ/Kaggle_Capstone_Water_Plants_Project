@@ -42,7 +42,10 @@ _Capstone_Project/
 │
 ├── skills/                      # Custom developer/agent skills
 │   ├── botanical-watering-skill # Contains the master watering skill & calculations
-│   └── git-commit-version       # Contains git safety hooks & pre-commit validation
+│   ├── git-commit-version       # Contains git safety hooks & pre-commit validation
+│   ├── prompt-documentation-skill # Guidelines for documenting design & architecture
+│   ├── safety-check-skill       # Chat-only safety check checklists
+│   └── stride-threat-model      # STRIDE threat modeling assessment instructions
 │
 ├── mcp_server/                  # Model Context Protocol (MCP) server
 │   └── weather_mcp.py           # Weather tool provider
@@ -63,14 +66,17 @@ _Capstone_Project/
 
 ### 1. Environment Configuration
 
-For local development using the standard Gemini backend, create a `.env` file in the project root (based on `.env.example`) and add your Gemini API Key:
+For local development using the standard Gemini backend, create a `.env` file in the project root (based on `.env.example`) and configure the following variables:
 
 ```env
 GEMINI_API_KEY="your_gemini_api_key_here"
+FLORAWAVE_API_KEY="your_optional_app_password_here"
 ```
 
 > [!IMPORTANT]
-> Make sure that `.env` is listed in your `.gitignore` file. You must **never** commit the `.env` file or any real API keys to version control!
+> - **`GEMINI_API_KEY`**: Required for the backend to perform Gemini AI queries. Get your key from [Google AI Studio](https://aistudio.google.com/).
+> - **`FLORAWAVE_API_KEY`**: The optional security password ("AI Feature Password"). If this key is set in your `.env` file, the backend will reject incoming requests unless they present this exact password. You will need to enter this password in the frontend settings modal to access the AI analysis features.
+> - Make sure that `.env` is listed in your `.gitignore` file. You must **never** commit the `.env` file or any real API keys or passwords to version control!
 
 ### 1.1 Coupling with Your Own Google Cloud Project
 
